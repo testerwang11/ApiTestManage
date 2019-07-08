@@ -17,8 +17,6 @@ def aps_test(project_id, case_ids, task_to_address=None, performer='无'):
     jump_res = d.run_case()
     d.build_report(jump_res, case_ids, performer)
     res = json.loads(jump_res)
-
-    scheduler.app.logger.info("task_to_address:" + str(task_to_address))
     task_to_address = task_to_address.split(',')
     file = render_html_report(res)
     s = SendEmail(task_to_address, file)
@@ -50,8 +48,9 @@ def run_task():
     data = request.json
     ids = data.get('id')
     _data = Task.query.filter_by(id=ids).first()
+
     cases_id = get_case_id(_data.project_id, json.loads(_data.set_id), json.loads(_data.case_id))
-    new_report_id = aps_test(_data.project_id, cases_id,task_to_address="wanghy@sijibao.com",
+    new_report_id = aps_test(_data.project_id, cases_id, task_to_address=_data.task_to_email_address,
                              performer=User.query.filter_by(id=current_user.id).first().name)
 
     return jsonify({'msg': '测试成功', 'status': 1, 'data': {'report_id': new_report_id}})
@@ -92,10 +91,10 @@ def add_task():
     name = data.get('name')
     task_type = 'cron'
     to_email = data.get('toEmail')
-    #send_email = data.get('sendEmail')
-    #password = data.get('password')
+    # send_email = data.get('sendEmail')
+    # password = data.get('password')
     # 0 0 1 * * *
-    if not (not to_email ) and not (to_email):
+    if not (not to_email) and not (to_email):
         return jsonify({'msg': '发件人必须有值', 'status': 0})
 
     time_config = data.get('timeConfig')
@@ -113,8 +112,8 @@ def add_task():
             old_task_data.task_name = name
             old_task_data.task_type = task_type
             old_task_data.task_to_email_address = to_email
-            #old_task_data.task_send_email_address = send_email
-            #old_task_data.email_password = password
+            # old_task_data.task_send_email_address = send_email
+            # old_task_data.email_password = password
             old_task_data.num = num
             if old_task_data.status != '创建' and old_task_data.task_config_time != time_config:
                 scheduler.reschedule_job(str(task_id), trigger='cron', **change_cron(time_config))  # 修改任务

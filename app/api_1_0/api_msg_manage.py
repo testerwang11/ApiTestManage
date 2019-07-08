@@ -19,6 +19,24 @@ def add_api_msg():
     header = data.get('header')
     extract = data.get('extract')
     validate = data.get('validate')
+
+    if validate!=None:
+        jsonarray = json.loads(validate, encoding='utf-8')
+        comparators = ['less_than','less_than_or_equals','greater_than','greater_than_or_equals']
+        i=0
+        for js in jsonarray:
+            if (js['key'] != None):
+                comparator = js['comparator']
+                """比较运算期望值转为int"""
+                if comparator in comparators:
+                    js['value'] = int(js['value'])
+                    jsonarray.pop(i)
+                    jsonarray.append(js)
+            else:
+                jsonarray.pop(i)
+            i =i+1
+            print(i)
+        validate = json.dumps(jsonarray)
     api_msg_id = data.get('apiMsgId')
     up_func = data.get('upFunc')
     down_func = data.get('downFunc')
@@ -246,3 +264,20 @@ def file_change():
         db.session.commit()
         case_num += 1
     return jsonify({'msg': '导入成功', 'status': 1})
+
+
+@api.route('/apiMsg/move', methods=['POST'])
+# @login_required
+def move_api_msg():
+    """ 移动接口到其他项目"""
+    data = request.json
+    case_ids = data.get('apiMsgIds')
+    project_id = data.get('project_id')
+    module_id = data.get('module_id')
+    for case_id in case_ids:
+        old_data = ApiMsg.query.filter_by(id=case_id).first()
+        old_data.project_id = project_id
+        old_data.module_id = module_id
+        db.session.commit()
+
+    return jsonify({'msg': "移动成功", 'status': 1})
