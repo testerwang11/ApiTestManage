@@ -6,7 +6,6 @@ from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.header import Header
-from email.mime.application import MIMEApplication
 from .mail_config import EMAIL_PORT, EMAIL_SERVICE, EMAIL_USER, EMAIL_PWD
 import base64
 from email import encoders
@@ -36,7 +35,7 @@ class SendEmail(object):
         '''
         att = MIMEBase('application', 'octet-stream')
         att.set_payload(self.file)
-        att.add_header('Content-Disposition', 'attachment', filename=('gbk', '', "接口测试报告.html"))
+        att.add_header('Content-Disposition', 'attachment', filename=('utf-8', '', "接口测试报告.html"))
         encoders.encode_base64(att)
         self._attachments.append(att)
 
