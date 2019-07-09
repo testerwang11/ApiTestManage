@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
-
+import os
 import smtplib
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
@@ -42,7 +42,7 @@ class SendEmail(object):
     def send_email(self):
         # 第三方 SMTP 服务
         message = MIMEMultipart()
-        #part = MIMEText('Dear all:\n       附件为接口自动化测试报告，此为自动发送邮件，请勿回复，谢谢！', 'plain', 'utf-8')
+        # part = MIMEText('Dear all:\n       附件为接口自动化测试报告，此为自动发送邮件，请勿回复，谢谢！', 'plain', 'utf-8')
         part = MIMEText(self.file, 'html', 'utf-8')
 
         message.attach(part)
@@ -50,8 +50,13 @@ class SendEmail(object):
         message['To'] = Header(''.join(self.to_list), 'utf-8')
         subject = '接口测试邮件'
         message['Subject'] = Header(subject, 'utf-8')
-        #self.add_attachment()
-        #message.attach(self._attachments[0])
+        # self.add_attachment()
+        # message.attach(self._attachments[0])
+        file = self.find_new_file("/wyyt/app/apitest/ApiTestManage/reports")
+        att = MIMEText(open(file, 'rb').read(), 'base64', 'utf-8')
+        att["Content-Type"] = 'application/octet-stream'
+        att["Content-Disposition"] = 'attachment; filename="report_test.html"'
+        message.attach(att)
 
         try:
             # service = smtplib.SMTP()
@@ -65,6 +70,17 @@ class SendEmail(object):
         except Exception as e:
             print(e)
             print('报错，邮件发送失败')
+
+    def find_new_file(dir):
+        '''查找目录下最新的文件'''
+        file_lists = os.listdir(dir)
+        file_lists.sort(key=lambda fn: os.path.getmtime(dir + "\\" + fn)
+        if not os.path.isdir(dir + "\\" + fn)
+        else 0)
+        # print('最新的文件为： ' + file_lists[-1])
+        file = os.path.join(dir, file_lists[-1])
+        print('完整文件路径：', file)
+        return file
 
 
 if __name__ == '__main__':
