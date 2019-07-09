@@ -20,10 +20,11 @@ def add_api_msg():
     extract = data.get('extract')
     validate = data.get('validate')
 
-    if validate!=None:
+    if validate != None:
         jsonarray = json.loads(validate, encoding='utf-8')
-        comparators = ['less_than','less_than_or_equals','greater_than','greater_than_or_equals','equals']
-        i=0
+        comparators = ['less_than', 'less_than_or_equals', 'greater_than', 'greater_than_or_equals', 'equals',
+                       'length_equals', 'length_greater_than','length_less_than','length_less_than_or_equals', 'count_greater_than_or_equals']
+        i = 0
         for js in jsonarray:
             if (js['key'] != None):
                 comparator = js['comparator']
@@ -34,7 +35,7 @@ def add_api_msg():
                     jsonarray.append(js)
             else:
                 jsonarray.pop(i)
-            i =i+1
+            i = i + 1
             print(i)
         validate = json.dumps(jsonarray)
     api_msg_id = data.get('apiMsgId')
