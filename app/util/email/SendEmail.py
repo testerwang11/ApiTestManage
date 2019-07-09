@@ -41,9 +41,22 @@ class SendEmail(object):
         self._attachments.append(att)
 
     def send_email(self):
+
+        html = """
+        <html>  
+          <head></head>  
+          <body>  
+            <p>Dear All!<br>  
+                   最新的在线测试报告<a href="http://192.168.0.187:8010/#/manage/reportShow?reportId=%s">link</a>请查阅！<br> 
+        	       附件为离线报告。<br> 
+        		   From测试组
+            </p> 
+          </body>  
+        </html>  
+        """
         # 第三方 SMTP 服务
         message = MIMEMultipart()
-        part = MIMEText('Dear all:\n       在线报告地址为:http://192.168.0.187:8010/#/manage/reportShow?reportId=%s \n附件为接口自动化测试报告，此为自动发送邮件，请勿回复，谢谢！' % self.reportId, 'plain', 'utf-8')
+        part = MIMEText(html % self.reportId, 'plain', 'utf-8')
         # part = MIMEText(self.file, 'html', 'utf-8')
 
         message.attach(part)
