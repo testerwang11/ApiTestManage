@@ -42,7 +42,7 @@ class SendEmail(object):
     def send_email(self):
         # 第三方 SMTP 服务
         message = MIMEMultipart()
-        part = MIMEText('Dear all:\n       附件为接口自动化测试报告，此为自动发送邮件，请勿回复，谢谢！', 'plain', 'utf-8')
+        part = MIMEText('Dear all:\n       在线报告地址为:http://192.168.0.187:8010/#/manage/reportShow?reportId=15 \n附件为接口自动化测试报告，此为自动发送邮件，请勿回复，谢谢！', 'plain', 'utf-8')
         # part = MIMEText(self.file, 'html', 'utf-8')
 
         message.attach(part)
