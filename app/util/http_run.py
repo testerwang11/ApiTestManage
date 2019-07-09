@@ -243,6 +243,7 @@ class RunCase(object):
         self.new_report_id = new_report.id
         with open('{}{}.txt'.format(REPORT_ADDRESS, self.new_report_id), 'w') as f:
             f.write(jump_res)
+        return new_report.id
 
     def run_case(self):
         scheduler.app.logger.info('测试数据：{}'.format(self.TEST_DATA))

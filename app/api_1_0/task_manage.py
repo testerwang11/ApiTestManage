@@ -15,11 +15,11 @@ def aps_test(project_id, case_ids, task_to_address=None, performer='无', taskNa
     d = RunCase(project_id)
     d.get_case_test(case_ids)
     jump_res = d.run_case()
-    d.build_report(jump_res, case_ids, performer)
+    reportId = d.build_report(jump_res, case_ids, performer)
     res = json.loads(jump_res)
     task_to_address = task_to_address.split(',')
     file = render_html_report(res)
-    s = SendEmail(task_to_address, taskName)
+    s = SendEmail(task_to_address, taskName, reportId)
     s.send_email()
     return d.new_report_id
 

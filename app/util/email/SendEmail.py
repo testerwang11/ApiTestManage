@@ -15,13 +15,14 @@ from config import Config
 class SendEmail(object):
     _attachments = []
 
-    def __init__(self, to_list, name):
+    def __init__(self, to_list, name, reportId):
         self.Email_service = EMAIL_SERVICE
         self.Email_port = EMAIL_PORT
         self.username = EMAIL_USER
         self.password = EMAIL_PWD
         self.to_list = to_list
         self.name = name
+        self.reportId = reportId
 
     def b64(self, headstr):
         """对邮件header及附件的文件名进行两次base64编码，防止outlook中乱码。email库源码中先对邮件进行一次base64解码然后组装邮件，所以两次编码"""
@@ -42,7 +43,7 @@ class SendEmail(object):
     def send_email(self):
         # 第三方 SMTP 服务
         message = MIMEMultipart()
-        part = MIMEText('Dear all:\n       在线报告地址为:http://192.168.0.187:8010/#/manage/reportShow?reportId=15 \n附件为接口自动化测试报告，此为自动发送邮件，请勿回复，谢谢！', 'plain', 'utf-8')
+        part = MIMEText('Dear all:\n       在线报告地址为:http://192.168.0.187:8010/#/manage/reportShow?reportId=%s \n附件为接口自动化测试报告，此为自动发送邮件，请勿回复，谢谢！' % self.reportId, 'plain', 'utf-8')
         # part = MIMEText(self.file, 'html', 'utf-8')
 
         message.attach(part)
