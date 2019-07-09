@@ -15,13 +15,13 @@ from config import Config
 class SendEmail(object):
     _attachments = []
 
-    def __init__(self, to_list, file):
+    def __init__(self, to_list, name):
         self.Email_service = EMAIL_SERVICE
         self.Email_port = EMAIL_PORT
         self.username = EMAIL_USER
         self.password = EMAIL_PWD
         self.to_list = to_list
-        self.file = file
+        self.name = name
 
     def b64(self, headstr):
         """对邮件header及附件的文件名进行两次base64编码，防止outlook中乱码。email库源码中先对邮件进行一次base64解码然后组装邮件，所以两次编码"""
@@ -34,7 +34,7 @@ class SendEmail(object):
             添加附件
         '''
         att = MIMEBase('application', 'octet-stream')
-        att.set_payload(self.file)
+        # att.set_payload(self.file)
         att.add_header('Content-Disposition', 'attachment', filename=('utf-8', '', "接口测试报告.html"))
         encoders.encode_base64(att)
         self._attachments.append(att)
@@ -48,7 +48,7 @@ class SendEmail(object):
         message.attach(part)
         message['From'] = Header("测试组", 'utf-8')
         message['To'] = Header(''.join(self.to_list), 'utf-8')
-        subject = '接口测试邮件'
+        subject = self.name + '__接口测试邮件'
         message['Subject'] = Header(subject, 'utf-8')
         Config.basedir
         file = self.find_new_file(Config.basedir + "/reports")
@@ -73,8 +73,8 @@ class SendEmail(object):
     def find_new_file(self, dir):
         '''查找目录下最新的文件'''
         file_lists = os.listdir(dir)
-        file_lists.sort(key=lambda fn: os.path.getmtime(dir + "\\" + fn)
-        if not os.path.isdir(dir + "\\" + fn)
+        file_lists.sort(key=lambda fn: os.path.getmtime(dir + "/" + fn)
+        if not os.path.isdir(dir + "/" + fn)
         else 0)
         # print('最新的文件为： ' + file_lists[-1])
         file = os.path.join(dir, file_lists[-1])

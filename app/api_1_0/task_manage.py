@@ -19,7 +19,8 @@ def aps_test(project_id, case_ids, task_to_address=None, performer='无'):
     res = json.loads(jump_res)
     task_to_address = task_to_address.split(',')
     file = render_html_report(res)
-    s = SendEmail(task_to_address, file)
+
+    s = SendEmail(task_to_address, res['name'])
     s.send_email()
     return d.new_report_id
 
