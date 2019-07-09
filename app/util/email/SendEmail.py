@@ -56,7 +56,7 @@ class SendEmail(object):
         """
         # 第三方 SMTP 服务
         message = MIMEMultipart()
-        part = MIMEText(html % self.reportId, 'plain', 'utf-8')
+        part = MIMEText(html % self.reportId, 'html', 'utf-8')
         # part = MIMEText(self.file, 'html', 'utf-8')
 
         message.attach(part)
