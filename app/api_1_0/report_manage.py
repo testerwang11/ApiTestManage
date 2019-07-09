@@ -35,7 +35,7 @@ def run_cases():
 
 
 @api.route('/report/list', methods=['POST'])
-@login_required
+#@login_required
 def get_report():
     """ 查看报告 """
     data = request.json
