@@ -9,6 +9,7 @@ from email.header import Header
 from .mail_config import EMAIL_PORT, EMAIL_SERVICE, EMAIL_USER, EMAIL_PWD
 import base64
 from email import encoders
+from config import Config
 
 
 class SendEmail(object):
@@ -41,18 +42,16 @@ class SendEmail(object):
     def send_email(self):
         # 第三方 SMTP 服务
         message = MIMEMultipart()
-        # part = MIMEText('Dear all:\n       附件为接口自动化测试报告，此为自动发送邮件，请勿回复，谢谢！', 'plain', 'utf-8')
-        part = MIMEText(self.file, 'html', 'utf-8')
+        part = MIMEText('Dear all:\n       附件为接口自动化测试报告，此为自动发送邮件，请勿回复，谢谢！', 'plain', 'utf-8')
+        # part = MIMEText(self.file, 'html', 'utf-8')
 
         message.attach(part)
         message['From'] = Header("测试组", 'utf-8')
         message['To'] = Header(''.join(self.to_list), 'utf-8')
         subject = '接口测试邮件'
         message['Subject'] = Header(subject, 'utf-8')
-        # self.add_attachment()
-        # message.attach(self._attachments[0])
-        file = self.find_new_file("/wyyt/app/apitest/ApiTestManage/reports")
-        print("文件:"+file)
+        Config.basedir
+        file = self.find_new_file(Config.basedir + "/reports")
         att = MIMEText(open(file, 'rb').read(), 'base64', 'utf-8')
         att["Content-Type"] = 'application/octet-stream'
         att["Content-Disposition"] = 'attachment; filename="report_test.html"'
@@ -71,7 +70,7 @@ class SendEmail(object):
             print(e)
             print('报错，邮件发送失败')
 
-    def find_new_file(dir):
+    def find_new_file(self, dir):
         '''查找目录下最新的文件'''
         file_lists = os.listdir(dir)
         file_lists.sort(key=lambda fn: os.path.getmtime(dir + "\\" + fn)
