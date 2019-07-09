@@ -21,7 +21,6 @@ class SendEmail(object):
         self.password = EMAIL_PWD
         self.to_list = to_list
         self.file = file
-        print(file)
 
     def b64(self, headstr):
         """对邮件header及附件的文件名进行两次base64编码，防止outlook中乱码。email库源码中先对邮件进行一次base64解码然后组装邮件，所以两次编码"""
@@ -53,6 +52,7 @@ class SendEmail(object):
         # self.add_attachment()
         # message.attach(self._attachments[0])
         file = self.find_new_file("/wyyt/app/apitest/ApiTestManage/reports")
+        print("文件:"+file)
         att = MIMEText(open(file, 'rb').read(), 'base64', 'utf-8')
         att["Content-Type"] = 'application/octet-stream'
         att["Content-Disposition"] = 'attachment; filename="report_test.html"'
