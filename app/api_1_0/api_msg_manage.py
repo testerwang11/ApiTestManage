@@ -22,7 +22,7 @@ def add_api_msg():
 
     if validate!=None:
         jsonarray = json.loads(validate, encoding='utf-8')
-        comparators = ['less_than','less_than_or_equals','greater_than','greater_than_or_equals']
+        comparators = ['less_than','less_than_or_equals','greater_than','greater_than_or_equals','equals']
         i=0
         for js in jsonarray:
             if (js['key'] != None):
