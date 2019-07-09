@@ -42,18 +42,16 @@ class SendEmail(object):
     def send_email(self):
         # 第三方 SMTP 服务
         message = MIMEMultipart()
-        part = MIMEText('Dear all:\n       附件为接口自动化测试报告，此为自动发送邮件，请勿回复，谢谢！', 'plain', 'utf-8')
+        #part = MIMEText('Dear all:\n       附件为接口自动化测试报告，此为自动发送邮件，请勿回复，谢谢！', 'plain', 'utf-8')
+        part = MIMEText(self.file, 'html', 'utf-8')
+
         message.attach(part)
         message['From'] = Header("测试组", 'utf-8')
         message['To'] = Header(''.join(self.to_list), 'utf-8')
         subject = '接口测试邮件'
         message['Subject'] = Header(subject, 'utf-8')
-
-        # 添加附件
-        #att1 = MIMEApplication(self.file,'base64', 'utf-8')
-        #att1.add_header('Content-Disposition', 'attachment', filename=('gbk', '', '接口测试报告.html'))
-        self.add_attachment()
-        message.attach(self._attachments[0])
+        #self.add_attachment()
+        #message.attach(self._attachments[0])
 
         try:
             # service = smtplib.SMTP()
