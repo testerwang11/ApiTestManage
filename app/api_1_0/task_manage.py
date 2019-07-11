@@ -90,6 +90,7 @@ def add_task():
     name = data.get('name')
     task_type = 'cron'
     to_email = data.get('toEmail')
+    notice_type = data.get('noticeType')
     # send_email = data.get('sendEmail')
     # password = data.get('password')
     # 0 0 1 * * *
@@ -111,6 +112,7 @@ def add_task():
             old_task_data.task_name = name
             old_task_data.task_type = task_type
             old_task_data.task_to_email_address = to_email
+            old_task_data.notice_type = notice_type
             # old_task_data.task_send_email_address = send_email
             # old_task_data.email_password = password
             old_task_data.num = num

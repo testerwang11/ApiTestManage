@@ -35,9 +35,9 @@ def num_sort(new_num, old_num, list_data, old_data):
 
 
 variable_regexp = r"\$([\w_]+)"
-function_regexp = r"\$\{([\w_]+\([\$\w\.\-_ =,]*\))\}"
+function_regexp = r"\$\{([\w_]+\([\$\%\w\.\-_ =,]*\))\}"
 # function_regexp = r"\$\{([\w_]+\([\$\w\W\.\-_ =,]*\))\}"
-function_regexp_compile = re.compile(r"^([\w_]+)\(([\$\w\.\-/_ =,]*)\)$")
+function_regexp_compile = re.compile(r"^([\w_]+)\(([\$\w\%\.\-/_ =,]*)\)$")
 # function_regexp_compile = re.compile(r"^([\w_]+)\(([\$\w\W\.\-/_ =,]*)\)$")
 
 
