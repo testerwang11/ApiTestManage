@@ -91,9 +91,9 @@ def add_task():
     name = data.get('name')
     task_type = 'cron'
 
-    to_email = int(data.get('toEmail'))
+    to_email = data.get('toEmail')
     # to_email = data.get('toEmail')
-    notice_type = data.get('noticeType')
+    notice_type = int(data.get('noticeType'))
     # send_email = data.get('sendEmail')
     # password = data.get('password')
     # 0 0 1 * * *
