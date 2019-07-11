@@ -11,14 +11,18 @@ from ..util.report.report import render_html_report
 from flask_login import current_user
 
 
-def aps_test(project_id, case_ids, task_to_address=None, performer='无', taskName=None):
+def aps_test(project_id, case_ids, task_to_address=None, performer='无', taskName=None, noticeType=None):
     d = RunCase(project_id)
     d.get_case_test(case_ids)
     jump_res = d.run_case()
     reportId = d.build_report(jump_res, case_ids, performer)
+    print(jump_res)
     res = json.loads(jump_res)
     task_to_address = task_to_address.split(',')
     file = render_html_report(res)
+    if noticeType==2:
+        ''''仅有失败用例时发送'''
+
     s = SendEmail(task_to_address, taskName, reportId)
     s.send_email()
     return d.new_report_id
@@ -50,7 +54,7 @@ def run_task():
     _data = Task.query.filter_by(id=ids).first()
     cases_id = get_case_id(_data.project_id, json.loads(_data.set_id), json.loads(_data.case_id))
     new_report_id = aps_test(_data.project_id, cases_id, task_to_address=_data.task_to_email_address,
-                             performer=User.query.filter_by(id=current_user.id).first().name, taskName=_data.task_name)
+                             performer=User.query.filter_by(id=current_user.id).first().name, taskName=_data.task_name, noticeType=_data.notice_type)
 
     return jsonify({'msg': '测试成功', 'status': 1, 'data': {'report_id': new_report_id}})
 
@@ -67,7 +71,7 @@ def start_task():
     scheduler.add_job(func=aps_test, trigger='cron',
                       args=[_data.project_id, cases_id,
                             _data.task_to_email_address, User.query.filter_by(id=current_user.id).first().name,
-                            _data.task_name],
+                            _data.task_name, _data.notice_type],
                       id=str(ids), **config_time)  # 添加任务
     _data.status = '启动'
     db.session.commit()
