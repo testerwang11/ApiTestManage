@@ -90,10 +90,8 @@ def add_task():
     num = auto_num(data.get('num'), Task, project_id=project_id)
     name = data.get('name')
     task_type = 'cron'
-    if data.get('toEmail') == '1':
-        to_email = True
-    else:
-        to_email = False
+
+    to_email = int(data.get('toEmail'))
     # to_email = data.get('toEmail')
     notice_type = data.get('noticeType')
     # send_email = data.get('sendEmail')
