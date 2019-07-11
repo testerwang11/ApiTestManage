@@ -66,7 +66,8 @@ def start_task():
     cases_id = get_case_id(_data.project_id, json.loads(_data.set_id), json.loads(_data.case_id))
     scheduler.add_job(func=aps_test, trigger='cron',
                       args=[_data.project_id, cases_id,
-                            _data.task_to_email_address, User.query.filter_by(id=current_user.id).first().name, _data.task_name],
+                            _data.task_to_email_address, User.query.filter_by(id=current_user.id).first().name,
+                            _data.task_name],
                       id=str(ids), **config_time)  # 添加任务
     _data.status = '启动'
     db.session.commit()
@@ -89,7 +90,11 @@ def add_task():
     num = auto_num(data.get('num'), Task, project_id=project_id)
     name = data.get('name')
     task_type = 'cron'
-    to_email = data.get('toEmail')
+    if data.get('toEmail') == '1':
+        to_email = True
+    else:
+        to_email = False
+    # to_email = data.get('toEmail')
     notice_type = data.get('noticeType')
     # send_email = data.get('sendEmail')
     # password = data.get('password')
