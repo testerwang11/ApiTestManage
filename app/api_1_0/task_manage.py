@@ -20,7 +20,7 @@ def aps_test(project_id, case_ids, task_to_address=None, performer='无', taskNa
     res = json.loads(jump_res)
     task_to_address = task_to_address.split(',')
     file = render_html_report(res)
-    if noticeType == 2:
+    if noticeType == '2':
         ''''仅有失败用例时发送'''
 
     s = SendEmail(task_to_address, taskName, reportId)
@@ -97,8 +97,8 @@ def add_task():
     task_type = 'cron'
 
     to_email = data.get('toEmail')
+    notice_type = data.get('noticeType')
     # to_email = data.get('toEmail')
-    notice_type = int(data.get('noticeType'))
     # send_email = data.get('sendEmail')
     # password = data.get('password')
     # 0 0 1 * * *

@@ -237,7 +237,7 @@ class Task(db.Model):
     email_password = db.Column(db.String(256), comment='发件人邮箱密码')
     status = db.Column(db.String(16), default=u'创建', comment='任务的运行状态，默认是创建')
     project_id = db.Column(db.String(16), nullable=True)
-    notice_type = db.Column(db.Integer, comment='邮件提醒方式')
+    notice_type = db.Column(db.String(10), comment='邮件提醒方式')
     created_time = db.Column(db.DateTime(), default=datetime.now, comment='任务的创建时间')
     update_time = db.Column(db.DateTime, index=True, default=datetime.now, onupdate=datetime.now)
 
