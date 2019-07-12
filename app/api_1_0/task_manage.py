@@ -23,10 +23,12 @@ def aps_test(project_id, case_ids, task_to_address=None, performer='无', taskNa
     notice = True
     if noticeType == '2':
         """仅有失败用例时发送"""
+        jump_res = json.loads(jump_res)
         fail_case = jump_res['stat']['testcases']['fail']
-        fail_step = jump_res['stat']['teststeps']['failures']
+        #fail_step = jump_res['stat']['teststeps']['failures']
         if fail_case == 0:
             """全部成功不发邮件"""
+            print("用例全部成功，根据配置不发送邮件提醒")
             notice = False
     if notice:
         s = SendEmail(task_to_address, taskName, reportId)
