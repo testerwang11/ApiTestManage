@@ -248,7 +248,9 @@ class RunCase(object):
     def run_case(self):
         scheduler.app.logger.info('测试数据：{}'.format(self.TEST_DATA))
         # res = main_ate(self.TEST_DATA)
-        runner = HttpRunner()
+        """失败终止测试"""
+        runner = HttpRunner(failfast=True)
+
         runner.run(self.TEST_DATA)
         jump_res = json.dumps(runner._summary, ensure_ascii=False, default=encode_object, cls=JSONEncoder)
         # scheduler.app.logger.info('返回数据：{}'.format(jump_res))
