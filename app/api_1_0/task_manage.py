@@ -20,7 +20,7 @@ def aps_test(project_id, case_ids, task_to_address=None, performer='无', taskNa
     res = json.loads(jump_res)
     task_to_address = task_to_address.split(',')
     file = render_html_report(res)
-    if noticeType==2:
+    if noticeType == 2:
         ''''仅有失败用例时发送'''
 
     s = SendEmail(task_to_address, taskName, reportId)
@@ -54,7 +54,8 @@ def run_task():
     _data = Task.query.filter_by(id=ids).first()
     cases_id = get_case_id(_data.project_id, json.loads(_data.set_id), json.loads(_data.case_id))
     new_report_id = aps_test(_data.project_id, cases_id, task_to_address=_data.task_to_email_address,
-                             performer=User.query.filter_by(id=current_user.id).first().name, taskName=_data.task_name, noticeType=_data.notice_type)
+                             performer=User.query.filter_by(id=current_user.id).first().name, taskName=_data.task_name,
+                             noticeType=_data.notice_type)
 
     return jsonify({'msg': '测试成功', 'status': 1, 'data': {'report_id': new_report_id}})
 
@@ -158,7 +159,7 @@ def edit_task():
     _data = {'num': c.num, 'task_name': c.task_name, 'task_config_time': c.task_config_time, 'task_type': c.task_type,
              'set_ids': json.loads(c.set_id), 'case_ids': json.loads(c.case_id),
              'task_to_email_address': c.task_to_email_address, 'task_send_email_address': c.task_send_email_address,
-             'password': c.email_password}
+             'password': c.email_password, 'notice_type': c.notice_type}
 
     return jsonify({'data': _data, 'status': 1})
 
