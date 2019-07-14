@@ -16,14 +16,14 @@ def add_scene_config():
     name = data.get('sceneConfigName')
     ids = data.get('id')
     func_address = json.dumps(data.get('funcAddress'))
-    variables = data.get('variables')
-    variables_two = data.get('variables_two')
-    variables_three = data.get('variables_three')
-    variables_four = data.get('variables_four')
+    variables = json.dumps(data.get('variables'))
+    variables_two = json.dumps(data.get('variables_two'))
+    variables_three = json.dumps(data.get('variables_three'))
+    variables_four = json.dumps(data.get('variables_four'))
 
     if not project_name:
         return jsonify({'msg': '请选择项目', 'status': 0})
-    if re.search('\${(.*?)}', str(variables), flags=0) and not func_address:
+    if re.search('\${(.*?)}', variables, flags=0) and not func_address:
         return jsonify({'msg': '参数引用函数后，必须引用函数文件', 'status': 0})
 
     num = auto_num(data.get('num'), Config, project_id=project_id)
@@ -44,7 +44,6 @@ def add_scene_config():
         old_data.variables_two = variables_two
         old_data.variables_three = variables_three
         old_data.variables_four = variables_four
-
         db.session.commit()
         return jsonify({'msg': '修改成功', 'status': 1})
     else:
@@ -53,8 +52,8 @@ def add_scene_config():
 
         else:
             new_config = Config(name=name, variables=variables, variables_two=variables_two,
-                                variable_three=variables_three,
-                                variable_four=variables_four, project_id=project_id, num=num,
+                                variables_three=variables_three,
+                                variables_four=variables_four, project_id=project_id, num=num,
                                 func_address=func_address)
             db.session.add(new_config)
             db.session.commit()
