@@ -16,10 +16,10 @@ def add_scene_config():
     name = data.get('sceneConfigName')
     ids = data.get('id')
     func_address = json.dumps(data.get('funcAddress'))
-    variables = json.dumps(data.get('variables'))
-    variables_two = json.dumps(data.get('variables_two'))
-    variables_three = json.dumps(data.get('variables_three'))
-    variables_four = json.dumps(data.get('variables_four'))
+    variables = data.get('variables')
+    variables_two = data.get('variables_two')
+    variables_three = data.get('variables_three')
+    variables_four = data.get('variables_four')
 
     if not project_name:
         return jsonify({'msg': '请选择项目', 'status': 0})
