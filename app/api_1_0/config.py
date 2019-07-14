@@ -23,7 +23,7 @@ def add_scene_config():
 
     if not project_name:
         return jsonify({'msg': '请选择项目', 'status': 0})
-    if re.search('\${(.*?)}', variables, flags=0) and not func_address:
+    if re.search('\${(.*?)}', str(variables), flags=0) and not func_address:
         return jsonify({'msg': '参数引用函数后，必须引用函数文件', 'status': 0})
 
     num = auto_num(data.get('num'), Config, project_id=project_id)
