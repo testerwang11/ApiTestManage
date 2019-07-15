@@ -112,7 +112,7 @@ def edit_config():
              'variables': json.loads(_edit.variables),
              'variables_two': json.loads(_edit.variables_two),
              'variables_three': json.loads(_edit.variables_three),
-             'variables_four': json.loads(_edit.variabls_four),
+             'variables_four': json.loads(_edit.variables_four),
 
              'func_address': json.loads(_edit.func_address)}
     return jsonify({'data': _data, 'status': 1})

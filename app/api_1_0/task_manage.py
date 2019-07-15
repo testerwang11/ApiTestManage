@@ -11,12 +11,11 @@ from ..util.report.report import render_html_report
 from flask_login import current_user
 
 
-def aps_test(project_id, case_ids, task_to_address=None, performer='无', taskName=None, noticeType=None):
+def aps_test(project_id, case_ids, task_to_address=None, performer='无', taskName=None, noticeType=None, env='first'):
     d = RunCase(project_id)
-    d.get_case_test(case_ids)
+    d.get_case_test(case_ids, env)
     jump_res = d.run_case()
     reportId = d.build_report(jump_res, case_ids, performer)
-    print(jump_res)
     res = json.loads(jump_res)
     task_to_address = task_to_address.split(',')
     file = render_html_report(res)
@@ -25,7 +24,7 @@ def aps_test(project_id, case_ids, task_to_address=None, performer='无', taskNa
         """仅有失败用例时发送"""
         jump_res = json.loads(jump_res)
         fail_case = jump_res['stat']['testcases']['fail']
-        #fail_step = jump_res['stat']['teststeps']['failures']
+        # fail_step = jump_res['stat']['teststeps']['failures']
         if fail_case == 0:
             """全部成功不发邮件"""
             print("用例全部成功，根据配置不发送邮件提醒")
@@ -63,7 +62,7 @@ def run_task():
     cases_id = get_case_id(_data.project_id, json.loads(_data.set_id), json.loads(_data.case_id))
     new_report_id = aps_test(_data.project_id, cases_id, task_to_address=_data.task_to_email_address,
                              performer=User.query.filter_by(id=current_user.id).first().name, taskName=_data.task_name,
-                             noticeType=_data.notice_type)
+                             noticeType=_data.notice_type, env=_data.environment_choice)
 
     return jsonify({'msg': '测试成功', 'status': 1, 'data': {'report_id': new_report_id}})
 
@@ -80,7 +79,7 @@ def start_task():
     scheduler.add_job(func=aps_test, trigger='cron',
                       args=[_data.project_id, cases_id,
                             _data.task_to_email_address, User.query.filter_by(id=current_user.id).first().name,
-                            _data.task_name, _data.notice_type],
+                            _data.task_name, _data.notice_type, _data.environment_choice],
                       id=str(ids), **config_time)  # 添加任务
     _data.status = '启动'
     db.session.commit()
@@ -103,7 +102,8 @@ def add_task():
     num = auto_num(data.get('num'), Task, project_id=project_id)
     name = data.get('name')
     task_type = 'cron'
-
+    task_id = data.get('id')
+    environment = data.get('environment')
     to_email = data.get('toEmail')
     notice_type = data.get('noticeType')
     # to_email = data.get('toEmail')
@@ -129,6 +129,7 @@ def add_task():
             old_task_data.task_type = task_type
             old_task_data.task_to_email_address = to_email
             old_task_data.notice_type = notice_type
+            old_task_data.environment_choice = environment
             # old_task_data.task_send_email_address = send_email
             # old_task_data.email_password = password
             old_task_data.num = num
@@ -151,7 +152,8 @@ def add_task():
                             task_type=task_type,
                             task_to_email_address=to_email,
                             task_config_time=time_config,
-                            num=num)
+                            num=num,
+                            environment_choice=environment)
             db.session.add(new_task)
             db.session.commit()
             return jsonify({'msg': '新建成功', 'status': 1})
@@ -167,7 +169,7 @@ def edit_task():
     _data = {'num': c.num, 'task_name': c.task_name, 'task_config_time': c.task_config_time, 'task_type': c.task_type,
              'set_ids': json.loads(c.set_id), 'case_ids': json.loads(c.case_id),
              'task_to_email_address': c.task_to_email_address, 'task_send_email_address': c.task_send_email_address,
-             'password': c.email_password, 'notice_type': c.notice_type}
+             'password': c.email_password, 'notice_type': c.notice_type, 'environment': c.environment_choice}
 
     return jsonify({'data': _data, 'status': 1})
 
@@ -193,7 +195,8 @@ def find_task():
         _data = pagination.items
         total = pagination.total
     task = [{'task_name': c.task_name, 'task_config_time': c.task_config_time,
-             'id': c.id, 'task_type': c.task_type, 'status': c.status} for c in _data]
+             'id': c.id, 'task_type': c.task_type, 'status': c.status, 'environment': c.environment_choice,
+             'notice_type': c.notice_type} for c in _data]
     return jsonify({'data': task, 'total': total, 'status': 1})
 
 

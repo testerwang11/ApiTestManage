@@ -15,6 +15,7 @@ def run_cases():
     """ 跑接口 """
     data = request.json
     case_ids = data.get('sceneIds')
+    envValue = data.get('envValue')
     if not data.get('projectName'):
         return jsonify({'msg': '请选择项目', 'status': 0})
     if not case_ids:
@@ -23,7 +24,7 @@ def run_cases():
 
     project_id = Project.query.filter_by(name=data.get('projectName')).first().id
     d = RunCase(project_id)
-    d.get_case_test(case_ids)
+    d.get_case_test(case_ids, envValue)
     jump_res = d.run_case()
 
     if data.get('reportStatus'):

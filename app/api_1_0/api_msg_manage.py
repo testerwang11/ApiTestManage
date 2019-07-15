@@ -23,7 +23,8 @@ def add_api_msg():
     if validate != None:
         jsonarray = json.loads(validate, encoding='utf-8')
         comparators = ['less_than', 'less_than_or_equals', 'greater_than', 'greater_than_or_equals', 'equals',
-                       'length_equals', 'length_greater_than','length_less_than','length_less_than_or_equals', 'count_greater_than_or_equals']
+                       'length_equals', 'length_greater_than', 'length_less_than', 'length_less_than_or_equals',
+                       'count_greater_than_or_equals']
         i = 0
         for js in jsonarray:
             if (js['key'] != None):
@@ -36,7 +37,6 @@ def add_api_msg():
             else:
                 jsonarray.pop(i)
             i = i + 1
-            print(i)
         validate = json.dumps(jsonarray)
     api_msg_id = data.get('apiMsgId')
     up_func = data.get('upFunc')
@@ -144,7 +144,19 @@ def run_api_msg():
     data = request.json
     api_msg_data = data.get('apiMsgData')
     project_name = data.get('projectName')
-    config_id = data.get('configId')
+
+    envValue = data.get("envValue")
+    if envValue == '测试环境':
+        envValue = 'first'
+    if envValue == '开发环境':
+        envValue = 'second'
+    if envValue == '生产环境':
+        envValue = 'third'
+    if envValue == '备用环境':
+        envValue = 'fourth'
+
+    #project_id = data.get('projectId')
+    #config_id = data.get('configId')
     if not api_msg_data:
         return jsonify({'msg': '请勾选信息后，再进行测试', 'status': 0})
 
@@ -156,7 +168,7 @@ def run_api_msg():
 
     project_id = Project.query.filter_by(name=project_name).first().id
     d = RunCase(project_id)
-    d.get_api_test(api_ids, config_id)
+    d.get_api_test(api_ids, project_id, envValue)
     res = json.loads(d.run_case())
 
     return jsonify({'msg': '测试完成', 'data': res, 'status': 1})

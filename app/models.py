@@ -232,6 +232,7 @@ class Task(db.Model):
     num = db.Column(db.Integer(), comment='任务序号')
     task_name = db.Column(db.String(64), comment='任务名称')
     task_config_time = db.Column(db.String(256), nullable=True, comment='cron表达式')
+    environment_choice = db.Column(db.String(16), comment='环境选择，first为测试，以此类推')
     set_id = db.Column(db.String(2048))
     case_id = db.Column(db.String(2048))
     task_type = db.Column(db.String(16))

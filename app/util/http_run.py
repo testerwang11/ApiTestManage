@@ -11,6 +11,7 @@ from flask.json import JSONEncoder
 
 
 class RunCase(object):
+
     def __init__(self, project_ids=None):
         self.project_ids = project_ids
         self.pro_config_data = None
@@ -18,18 +19,26 @@ class RunCase(object):
         self.new_report_id = None
         self.TEST_DATA = {'testcases': [], 'project_mapping': {'functions': {}, 'variables': {}}}
         self.init_project_data()
+        self.environment_choice = "first"
 
     def init_project_data(self):
         pro_base_url = {}
         for pro_data in Project.query.all():
             if pro_data.environment_choice == 'first':
                 pro_base_url['{}'.format(pro_data.id)] = json.loads(pro_data.host)
-            elif pro_data.environment_choice == 'second':
+                #self.environment_choice = "first"
+
+            if pro_data.environment_choice == 'second':
                 pro_base_url['{}'.format(pro_data.id)] = json.loads(pro_data.host_two)
+                #self.environment_choice = "second"
+
             if pro_data.environment_choice == 'third':
                 pro_base_url['{}'.format(pro_data.id)] = json.loads(pro_data.host_three)
+                #self.environment_choice = "third"
+
             if pro_data.environment_choice == 'fourth':
                 pro_base_url['{}'.format(pro_data.id)] = json.loads(pro_data.host_four)
+                #self.environment_choice = "fourth"
         self.pro_base_url = pro_base_url
         self.pro_config(Project.query.filter_by(id=self.project_ids).first())
 
@@ -187,9 +196,10 @@ class RunCase(object):
 
         return _data
 
-    def get_api_test(self, api_ids, config_id):
+    def get_api_test(self, api_ids, project_id, envValue):
+        self.environment_choice = envValue
         """
-        接口调试时，用到的方法
+        接口调试时，用到的方法.
         :param api_ids: 接口id列表
         :param config_id: 配置id
         :return:
@@ -197,22 +207,41 @@ class RunCase(object):
         scheduler.app.logger.info('本次测试的接口id：{}'.format(api_ids))
         _steps = {'teststeps': [], 'config': {'variables': {}}, 'output': ['phone']}
 
-        if config_id:
-            config_data = Config.query.filter_by(id=config_id).first()
-            _config = json.loads(config_data.variables) if config_id else []
+        if project_id:
+            """
+            取对应环境的配置
+            """
+            # config_data = Config.query.filter_by(id=config_id).first()
+            config_data = Config.query.filter_by(project_id=project_id).first()
+
+            _config = self.get_project_config(project_id)
             _steps['config']['variables'].update({v['key']: v['value'] for v in _config if v['key']})
             self.extract_func(['{}'.format(f.replace('.py', '')) for f in json.loads(config_data.func_address)])
 
         _steps['teststeps'] = [self.assemble_step(api_id, None, self.pro_base_url, False) for api_id in api_ids]
         self.TEST_DATA['testcases'].append(_steps)
 
-    def get_case_test(self, case_ids):
+    def get_project_config(self, project_id):
+        print("执行环境:"+self.environment_choice)
+        config_data = Config.query.filter_by(project_id=project_id).first()
+        if self.environment_choice == 'first':
+            _config = json.loads(config_data.variables) if project_id else []
+        elif self.environment_choice == 'second':
+            _config = json.loads(config_data.variables_two) if project_id else []
+        elif self.environment_choice == 'third':
+            _config = json.loads(config_data.variables_three) if project_id else []
+        elif self.environment_choice == 'fourth':
+            _config = json.loads(config_data.variables_four) if project_id else []
+        return _config
+
+    def get_case_test(self, case_ids, envValue):
         """
         用例调试时，用到的方法
         :param case_ids: 用例id列表
         :return:
         """
         scheduler.app.logger.info('本次测试的用例id：{}'.format(case_ids))
+        self.environment_choice = envValue
 
         for case_id in case_ids:
             case_data = Case.query.filter_by(id=case_id).first()
@@ -220,9 +249,10 @@ class RunCase(object):
             for s in range(case_times):
                 _steps = {'teststeps': [], 'config': {'variables': {}, 'name': ''}}
                 _steps['config']['name'] = case_data.name
-
+                # config_data = Config.query.filter_by(project_id=case_data.project_id)
                 # 获取用例的配置数据
-                _config = json.loads(case_data.variable) if case_data.variable else []
+                _config = self.get_project_config(case_data.project_id)
+
                 _steps['config']['variables'].update({v['key']: v['value'] for v in _config if v['key']})
 
                 self.extract_func(['{}'.format(f.replace('.py', '')) for f in json.loads(case_data.func_address)])
@@ -249,7 +279,7 @@ class RunCase(object):
         scheduler.app.logger.info('测试数据：{}'.format(self.TEST_DATA))
         # res = main_ate(self.TEST_DATA)
         """失败终止测试"""
-        runner = HttpRunner(failfast=True)
+        runner = HttpRunner(failfast=False)
 
         runner.run(self.TEST_DATA)
         jump_res = json.dumps(runner._summary, ensure_ascii=False, default=encode_object, cls=JSONEncoder)
