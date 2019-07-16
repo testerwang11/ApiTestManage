@@ -36,7 +36,7 @@ def run_cases():
 
 
 @api.route('/report/list', methods=['POST'])
-#@login_required
+# @login_required
 def get_report():
     """ 查看报告 """
     data = request.json
@@ -92,7 +92,7 @@ def del_report():
     report_id = data.get('report_id')
     _edit = Report.query.filter_by(id=report_id).first()
     db.session.delete(_edit)
-    address = str(report_id)+'.txt'
+    address = str(report_id) + '.txt'
     if not os.path.exists(REPORT_ADDRESS + address):
         return jsonify({'msg': '删除成功', 'status': 1})
     else:
@@ -112,13 +112,13 @@ def find_report():
 
     report_data = Report.query.filter_by(project_id=project_id)
     pagination = report_data.order_by(Report.create_time.desc()).paginate(page, per_page=per_page, error_out=False)
+
     report = pagination.items
     total = pagination.total
     report = [{'name': c.case_names, 'project_name': project_name, 'id': c.id, 'read_status': c.read_status,
                'performer': c.performer,
+               'envData': c.environment_choice,
                'create_time': str(c.create_time).split('.')[0]} for c in report]
-
     return jsonify({'data': report, 'total': total, 'status': 1})
-
 
 # END

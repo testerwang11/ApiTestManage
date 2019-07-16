@@ -15,21 +15,22 @@ def aps_test(project_id, case_ids, task_to_address=None, performer='无', taskNa
     d = RunCase(project_id)
     d.get_case_test(case_ids, env)
     jump_res = d.run_case()
+    """报告写入数据库"""
     reportId = d.build_report(jump_res, case_ids, performer)
     res = json.loads(jump_res)
-    task_to_address = task_to_address.split(',')
-    file = render_html_report(res)
+    res['html_report_name'] = taskName
+    render_html_report(res)
     notice = True
     if noticeType == '2':
         """仅有失败用例时发送"""
-        jump_res = json.loads(jump_res)
-        fail_case = jump_res['stat']['testcases']['fail']
+        # jump_res = json.loads(jump_res)
+        fail_case = res['stat']['testcases']['fail']
         # fail_step = jump_res['stat']['teststeps']['failures']
         if fail_case == 0:
-            """全部成功不发邮件"""
             print("用例全部成功，根据配置不发送邮件提醒")
             notice = False
     if notice:
+        task_to_address = task_to_address.split(',')
         s = SendEmail(task_to_address, taskName, reportId)
         s.send_email()
     return d.new_report_id

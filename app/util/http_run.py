@@ -222,7 +222,6 @@ class RunCase(object):
         self.TEST_DATA['testcases'].append(_steps)
 
     def get_project_config(self, project_id):
-        print("执行环境:"+self.environment_choice)
         config_data = Config.query.filter_by(project_id=project_id).first()
         if self.environment_choice == 'first':
             _config = json.loads(config_data.variables) if project_id else []
@@ -266,7 +265,7 @@ class RunCase(object):
 
         new_report = Report(
             case_names=','.join([Case.query.filter_by(id=scene_id).first().name for scene_id in case_ids]),
-            project_id=self.project_ids, read_status='待阅', performer=performer)
+            project_id=self.project_ids, read_status='待阅', performer=performer, environment_choice=self.environment_choice)
         db.session.add(new_report)
         db.session.commit()
 
@@ -283,5 +282,7 @@ class RunCase(object):
 
         runner.run(self.TEST_DATA)
         jump_res = json.dumps(runner._summary, ensure_ascii=False, default=encode_object, cls=JSONEncoder)
-        # scheduler.app.logger.info('返回数据：{}'.format(jump_res))
+        scheduler.app.logger.info('返回数据：{}'.format(jump_res))
         return jump_res
+
+
