@@ -12,33 +12,29 @@ from flask.json import JSONEncoder
 
 class RunCase(object):
 
-    def __init__(self, project_ids=None):
+    def __init__(self, project_ids=None, environment_choice='first'):
         self.project_ids = project_ids
         self.pro_config_data = None
         self.pro_base_url = None
         self.new_report_id = None
         self.TEST_DATA = {'testcases': [], 'project_mapping': {'functions': {}, 'variables': {}}}
+        self.environment_choice = environment_choice
         self.init_project_data()
-        self.environment_choice = "first"
 
     def init_project_data(self):
+
         pro_base_url = {}
         for pro_data in Project.query.all():
-            if pro_data.environment_choice == 'first':
+            if self.environment_choice == 'first':
                 pro_base_url['{}'.format(pro_data.id)] = json.loads(pro_data.host)
-                #self.environment_choice = "first"
-
-            if pro_data.environment_choice == 'second':
+            elif self.environment_choice == 'second':
                 pro_base_url['{}'.format(pro_data.id)] = json.loads(pro_data.host_two)
-                #self.environment_choice = "second"
-
-            if pro_data.environment_choice == 'third':
+            elif self.environment_choice == 'third':
                 pro_base_url['{}'.format(pro_data.id)] = json.loads(pro_data.host_three)
-                #self.environment_choice = "third"
-
-            if pro_data.environment_choice == 'fourth':
+                print(json.loads(pro_data.host_three))
+            elif self.environment_choice == 'fourth':
                 pro_base_url['{}'.format(pro_data.id)] = json.loads(pro_data.host_four)
-                #self.environment_choice = "fourth"
+
         self.pro_base_url = pro_base_url
         self.pro_config(Project.query.filter_by(id=self.project_ids).first())
 
@@ -196,8 +192,8 @@ class RunCase(object):
 
         return _data
 
-    def get_api_test(self, api_ids, project_id, envValue):
-        self.environment_choice = envValue
+    def get_api_test(self, api_ids, project_id):
+        #self.environment_choice = envValue
         """
         接口调试时，用到的方法.
         :param api_ids: 接口id列表
@@ -233,14 +229,14 @@ class RunCase(object):
             _config = json.loads(config_data.variables_four) if project_id else []
         return _config
 
-    def get_case_test(self, case_ids, envValue):
+    def get_case_test(self, case_ids):
         """
         用例调试时，用到的方法
         :param case_ids: 用例id列表
         :return:
         """
         scheduler.app.logger.info('本次测试的用例id：{}'.format(case_ids))
-        self.environment_choice = envValue
+        #self.environment_choice = envValue
 
         for case_id in case_ids:
             case_data = Case.query.filter_by(id=case_id).first()
@@ -279,10 +275,9 @@ class RunCase(object):
         # res = main_ate(self.TEST_DATA)
         """失败终止测试"""
         runner = HttpRunner(failfast=False)
-
         runner.run(self.TEST_DATA)
         jump_res = json.dumps(runner._summary, ensure_ascii=False, default=encode_object, cls=JSONEncoder)
-        scheduler.app.logger.info('返回数据：{}'.format(jump_res))
+        #scheduler.app.logger.info('返回数据：{}'.format(jump_res))
         return jump_res
 
 
