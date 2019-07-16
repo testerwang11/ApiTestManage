@@ -112,13 +112,23 @@ def find_report():
 
     report_data = Report.query.filter_by(project_id=project_id)
     pagination = report_data.order_by(Report.create_time.desc()).paginate(page, per_page=per_page, error_out=False)
-
     report = pagination.items
     total = pagination.total
     report = [{'name': c.case_names, 'project_name': project_name, 'id': c.id, 'read_status': c.read_status,
                'performer': c.performer,
-               'envData': c.environment_choice,
+               'envData': envTrans(c.environment_choice),
                'create_time': str(c.create_time).split('.')[0]} for c in report]
     return jsonify({'data': report, 'total': total, 'status': 1})
 
+def envTrans(env):
+    str = "测试环境"
+    if env == 'first':
+        str = "测试环境"
+    if env == 'second':
+        str = "开发环境"
+    if env == 'third':
+        str = "生产环境"
+    if env == 'fourth':
+        str = "准生产环境"
+    return str
 # END
