@@ -47,7 +47,7 @@ class SendEmail(object):
           <head></head>  
           <body>  
             <p>Dear All!<br>  
-                   最新的在线测试报告<a href="http://192.168.0.187:8010/#/manage/reportShow?reportId=%s">link</a>请查阅！<br> 
+                   最新的在线测试报告<a href="http://192.168.0.187/#/manage/reportShow?reportId=%s">link</a>请查阅！<br> 
         	       附件为离线报告。<br> 
         		   From测试组
             </p> 
