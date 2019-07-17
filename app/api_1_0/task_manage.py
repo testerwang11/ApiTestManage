@@ -12,8 +12,8 @@ from flask_login import current_user
 
 
 def aps_test(project_id, case_ids, task_to_address=None, performer='无', taskName=None, noticeType=None, env='first'):
-    d = RunCase(project_id)
-    d.get_case_test(case_ids, env)
+    d = RunCase(project_id, env)
+    d.get_case_test(case_ids)
     jump_res = d.run_case()
     """报告写入数据库"""
     reportId = d.build_report(jump_res, case_ids, performer)

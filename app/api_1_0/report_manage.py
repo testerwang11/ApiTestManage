@@ -23,8 +23,8 @@ def run_cases():
     # run_case = RunCase(data.get('projectName'), data.get('sceneIds'))
 
     project_id = Project.query.filter_by(name=data.get('projectName')).first().id
-    d = RunCase(project_id)
-    d.get_case_test(case_ids, envValue)
+    d = RunCase(project_id,envValue)
+    d.get_case_test(case_ids)
     jump_res = d.run_case()
 
     if data.get('reportStatus'):

@@ -31,7 +31,6 @@ class RunCase(object):
                 pro_base_url['{}'.format(pro_data.id)] = json.loads(pro_data.host_two)
             elif self.environment_choice == 'third':
                 pro_base_url['{}'.format(pro_data.id)] = json.loads(pro_data.host_three)
-                print(json.loads(pro_data.host_three))
             elif self.environment_choice == 'fourth':
                 pro_base_url['{}'.format(pro_data.id)] = json.loads(pro_data.host_four)
 
