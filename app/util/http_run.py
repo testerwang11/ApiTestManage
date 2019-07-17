@@ -192,7 +192,7 @@ class RunCase(object):
         return _data
 
     def get_api_test(self, api_ids, project_id):
-        #self.environment_choice = envValue
+        # self.environment_choice = envValue
         """
         接口调试时，用到的方法.
         :param api_ids: 接口id列表
@@ -217,6 +217,8 @@ class RunCase(object):
         self.TEST_DATA['testcases'].append(_steps)
 
     def get_project_config(self, project_id):
+        """根据配置取不同环境数据"""
+
         config_data = Config.query.filter_by(project_id=project_id).first()
         if self.environment_choice == 'first':
             _config = json.loads(config_data.variables) if project_id else []
@@ -228,6 +230,8 @@ class RunCase(object):
             _config = json.loads(config_data.variables_four) if project_id else []
         return _config
 
+
+
     def get_case_test(self, case_ids):
         """
         用例调试时，用到的方法
@@ -235,21 +239,21 @@ class RunCase(object):
         :return:
         """
         scheduler.app.logger.info('本次测试的用例id：{}'.format(case_ids))
-        #self.environment_choice = envValue
-
         for case_id in case_ids:
             case_data = Case.query.filter_by(id=case_id).first()
             case_times = case_data.times if case_data.times else 1
             for s in range(case_times):
                 _steps = {'teststeps': [], 'config': {'variables': {}, 'name': ''}}
                 _steps['config']['name'] = case_data.name
-                # config_data = Config.query.filter_by(project_id=case_data.project_id)
-                # 获取用例的配置数据
+                """从配置表取内置函数"""
+                config_data = Config.query.filter_by(project_id=case_data.project_id).first()
+                # 获取项目的配置数据
                 _config = self.get_project_config(case_data.project_id)
-
                 _steps['config']['variables'].update({v['key']: v['value'] for v in _config if v['key']})
-
-                self.extract_func(['{}'.format(f.replace('.py', '')) for f in json.loads(case_data.func_address)])
+                """从用例表中取数据"""
+                # self.extract_func(['{}'.format(f.replace('.py', '')) for f in json.loads(case_data.func_address)])
+                """从配置表取数据"""
+                self.extract_func(['{}'.format(f.replace('.py', '')) for f in json.loads(config_data.func_address)])
 
                 for _step in CaseData.query.filter_by(case_id=case_id).order_by(CaseData.num.asc()).all():
                     if _step.status == 'true':  # 判断步骤状态，是否执行
@@ -260,7 +264,8 @@ class RunCase(object):
 
         new_report = Report(
             case_names=','.join([Case.query.filter_by(id=scene_id).first().name for scene_id in case_ids]),
-            project_id=self.project_ids, read_status='待阅', performer=performer, environment_choice=self.environment_choice)
+            project_id=self.project_ids, read_status='待阅', performer=performer,
+            environment_choice=self.environment_choice)
         db.session.add(new_report)
         db.session.commit()
 
@@ -276,7 +281,5 @@ class RunCase(object):
         runner = HttpRunner(failfast=False)
         runner.run(self.TEST_DATA)
         jump_res = json.dumps(runner._summary, ensure_ascii=False, default=encode_object, cls=JSONEncoder)
-        #scheduler.app.logger.info('返回数据：{}'.format(jump_res))
+        # scheduler.app.logger.info('返回数据：{}'.format(jump_res))
         return jump_res
-
-
