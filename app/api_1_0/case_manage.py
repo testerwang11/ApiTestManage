@@ -22,6 +22,9 @@ def add_case():
     project_data = Project.query.filter_by(name=project).first()
     project_id = project_data.id
     variable = data.get('variable')
+    #类型转换
+    #variable = convert_str2int(data.get('variable'))
+
     api_cases = data.get('apiCases')
     merge_variable = json.dumps(json.loads(variable) + json.loads(project_data.variables))
     _temp_check = extract_variables(convert(json.loads(merge_variable)))
@@ -63,7 +66,9 @@ def add_case():
                 old_api_case = CaseData.query.filter_by(id=c.get('id')).first()
                 old_api_case.num = _num
                 old_api_case.extract = json.dumps(c['extract'])
-                old_api_case.validate = json.dumps(c['validate'])
+
+                #old_api_case.validate = json.dumps(c['validate'])
+                old_api_case.validate = convert_str2int(c['validate'])
                 old_api_case.variable = json.dumps(c['variable'])
                 old_api_case.header = json.dumps(c['header'])
                 old_api_case.json_variable = c['json_variable']

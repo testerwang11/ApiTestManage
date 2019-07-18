@@ -19,7 +19,7 @@ def auto_num(num, model, **kwargs):
 def num_sort(new_num, old_num, list_data, old_data):
     """修改排序,自动按新旧序号重新排列"""
     if old_data not in list_data:
-        old_data.num = len(list_data)+1
+        old_data.num = len(list_data) + 1
     else:
         _temp_data = list_data.pop(list_data.index(old_data))
         list_data.insert(new_num - 1, _temp_data)
@@ -38,6 +38,8 @@ variable_regexp = r"\$([\w_]+)"
 function_regexp = r"\$\{([\w_]+\([\$\%\w\.\-_ =,]*\))\}"
 # function_regexp = r"\$\{([\w_]+\([\$\w\W\.\-_ =,]*\))\}"
 function_regexp_compile = re.compile(r"^([\w_]+)\(([\$\w\%\.\-/_ =,]*)\)$")
+
+
 # function_regexp_compile = re.compile(r"^([\w_]+)\(([\$\w\W\.\-/_ =,]*)\)$")
 
 
@@ -233,6 +235,27 @@ def encode_object(obj):
         return str(obj)
 
     # raise TypeError("{} is not JSON serializable".format(obj))
+
+
+def convert_str2int(validate):
+    """断言条件为数字时，将str转换为int"""
+    jsonarray = json.loads(validate, encoding='utf-8')
+    comparators = ['less_than', 'less_than_or_equals', 'greater_than', 'greater_than_or_equals', 'equals',
+                   'length_equals', 'length_greater_than', 'length_less_than', 'length_less_than_or_equals',
+                   'count_greater_than_or_equals']
+    i = 0
+    for js in jsonarray:
+        if (js['key'] != None):
+            comparator = js['comparator']
+            """比较运算期望值转为int"""
+            if comparator in comparators:
+                js['value'] = int(js['value'])
+                jsonarray.pop(i)
+                jsonarray.append(js)
+        else:
+            jsonarray.pop(i)
+        i = i + 1
+    return json.dumps(jsonarray)
 
 
 if __name__ == '__main__':

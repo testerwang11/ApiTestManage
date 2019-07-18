@@ -18,26 +18,8 @@ def add_api_msg():
     desc = data.get('desc')
     header = data.get('header')
     extract = data.get('extract')
-    validate = data.get('validate')
-
-    if validate != None:
-        jsonarray = json.loads(validate, encoding='utf-8')
-        comparators = ['less_than', 'less_than_or_equals', 'greater_than', 'greater_than_or_equals', 'equals',
-                       'length_equals', 'length_greater_than', 'length_less_than', 'length_less_than_or_equals',
-                       'count_greater_than_or_equals']
-        i = 0
-        for js in jsonarray:
-            if (js['key'] != None):
-                comparator = js['comparator']
-                """比较运算期望值转为int"""
-                if comparator in comparators:
-                    js['value'] = int(js['value'])
-                    jsonarray.pop(i)
-                    jsonarray.append(js)
-            else:
-                jsonarray.pop(i)
-            i = i + 1
-        validate = json.dumps(jsonarray)
+    # validate = data.get('validate')
+    validate = convert_str2int(data.get('validate'))
     api_msg_id = data.get('apiMsgId')
     up_func = data.get('upFunc')
     down_func = data.get('downFunc')
@@ -155,8 +137,8 @@ def run_api_msg():
     if envValue == '备用环境':
         envValue = 'fourth'
 
-    #project_id = data.get('projectId')
-    #config_id = data.get('configId')
+    # project_id = data.get('projectId')
+    # config_id = data.get('configId')
     if not api_msg_data:
         return jsonify({'msg': '请勾选信息后，再进行测试', 'status': 0})
 
