@@ -9,27 +9,46 @@ from ..util.utils import change_cron, auto_num
 from ..util.email.SendEmail import SendEmail
 from ..util.report.report import render_html_report
 from flask_login import current_user
+from ..util.global_variable import *
+import time
 
 
-def aps_test(project_id, case_ids, task_to_address=None, performer='无', taskName=None, noticeType=None, env='first'):
+def aps_test(project_id, case_ids, task_to_address=None, performer='无', taskName=None, noticeType=None, env='first',
+             retry=False):
+    """执行测试"""
     d = RunCase(project_id, env)
     d.get_case_test(case_ids)
-    jump_res = d.run_case()
-    """报告写入数据库"""
-    reportId = d.build_report(jump_res, case_ids, performer)
-    res = json.loads(jump_res)
-    res['html_report_name'] = taskName
-    render_html_report(res)
-    notice = True
+    if retry:
+        maxTimes = FAIL_RETRY_TIMES
+    else:
+        maxTimes = 1
+    i = 0
+    reportId = 0
+    while i < maxTimes:
+        jump_res = d.run_case()
+        """报告写入数据库"""
+        reportId = d.build_report(jump_res, case_ids, performer)
+        res = json.loads(jump_res)
+        fsize = res['stat']['testcases']['fail']
+        res['html_report_name'] = taskName
+        render_html_report(res)
+        if fsize == 0:
+            break
+        """如果是重试模式则，等待"""
+        if retry:
+            print("第次"+str(i)+"重试，等待:"+str(FAIL_WAIT)+"秒")
+            time.sleep(FAIL_WAIT)
+        i = i + 1
+
+    notNotice = True
     if noticeType == '2':
         """仅有失败用例时发送"""
-        # jump_res = json.loads(jump_res)
-        fail_case = res['stat']['testcases']['fail']
         # fail_step = jump_res['stat']['teststeps']['failures']
-        if fail_case == 0:
+        if fsize == 0:
             print("用例全部成功，根据配置不发送邮件提醒")
-            notice = False
-    if notice:
+            notNotice = False
+
+    if notNotice:
         task_to_address = task_to_address.split(',')
         s = SendEmail(task_to_address, taskName, reportId)
         s.send_email()
@@ -64,7 +83,6 @@ def run_task():
     new_report_id = aps_test(_data.project_id, cases_id, task_to_address=_data.task_to_email_address,
                              performer=User.query.filter_by(id=current_user.id).first().name, taskName=_data.task_name,
                              noticeType=_data.notice_type, env=_data.environment_choice)
-
     return jsonify({'msg': '测试成功', 'status': 1, 'data': {'report_id': new_report_id}})
 
 
@@ -80,7 +98,7 @@ def start_task():
     scheduler.add_job(func=aps_test, trigger='cron',
                       args=[_data.project_id, cases_id,
                             _data.task_to_email_address, User.query.filter_by(id=current_user.id).first().name,
-                            _data.task_name, _data.notice_type, _data.environment_choice],
+                            _data.task_name, _data.notice_type, _data.environment_choice, True],
                       id=str(ids), **config_time)  # 添加任务
     _data.status = '启动'
     db.session.commit()

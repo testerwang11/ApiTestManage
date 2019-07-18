@@ -60,17 +60,15 @@ class SendEmail(object):
         # part = MIMEText(self.file, 'html', 'utf-8')
 
         message.attach(part)
-        message['From'] = Header("测试组", 'utf-8')
+        message['From'] = Header("王会勇", 'utf-8')
         message['To'] = Header(''.join(self.to_list), 'utf-8')
-        subject = self.name + '__接口测试邮件'
+        subject = self.name
         message['Subject'] = Header(subject, 'utf-8')
-        Config.basedir
         file = self.find_new_file(Config.basedir + "/reports")
         att = MIMEText(open(file, 'rb').read(), 'base64', 'utf-8')
         att["Content-Type"] = 'application/octet-stream'
         att["Content-Disposition"] = 'attachment; filename="report_test.html"'
         message.attach(att)
-
         try:
             # service = smtplib.SMTP()
             # service.connect(self.Email_service, 465)  # 25 为 SMTP 端口号

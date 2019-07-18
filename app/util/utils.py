@@ -240,7 +240,7 @@ def encode_object(obj):
 def convert_str2int(validate):
     """断言条件为数字时，将str转换为int"""
     validate = str(validate).replace("'", "\"")
-    jsonarray = json.loads(str(validate), encoding='utf-8')
+    jsonarray = json.loads(validate, encoding='utf-8')
     comparators = ['less_than', 'less_than_or_equals', 'greater_than', 'greater_than_or_equals', 'equals',
                    'length_equals', 'length_greater_than', 'length_less_than', 'length_less_than_or_equals',
                    'count_greater_than_or_equals']

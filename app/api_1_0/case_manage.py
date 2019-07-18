@@ -66,7 +66,6 @@ def add_case():
                 old_api_case = CaseData.query.filter_by(id=c.get('id')).first()
                 old_api_case.num = _num
                 old_api_case.extract = json.dumps(c['extract'])
-
                 #old_api_case.validate = json.dumps(c['validate'])
                 old_api_case.validate = convert_str2int(c['validate'])
                 old_api_case.variable = json.dumps(c['variable'])

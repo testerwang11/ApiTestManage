@@ -218,7 +218,6 @@ class RunCase(object):
 
     def get_project_config(self, project_id):
         """根据配置取不同环境数据"""
-
         config_data = Config.query.filter_by(project_id=project_id).first()
         if self.environment_choice == 'first':
             _config = json.loads(config_data.variables) if project_id else []
