@@ -249,6 +249,7 @@ def convert_str2int(validate):
             comparator = js['comparator']
             """比较运算期望值转为int"""
             if comparator in comparators:
+                print("检查:" + comparator)
                 js['value'] = int(js['value'])
                 jsonarray.pop(i)
                 jsonarray.append(js)
