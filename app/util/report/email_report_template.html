@@ -65,11 +65,11 @@
             text-align: left;
         }
 
-        .details .true {
+        .details .True {
             background-color: greenyellow;
         }
 
-        .details .false {
+        .details .False {
             background-color: red;
         }
 
@@ -128,10 +128,10 @@
         <th>开始时间</th>
         <td colspan="4">{{ time.start_datetime }}</td>
     </tr>
-    <tr>
+{#    <tr>
         <th>消耗时间</th>
         <td colspan="4">{{ '%0.3f'| format(time.duration|float) }} 毫秒</td>
-    </tr>
+    </tr>#}
     <tr>
         <th>在线报告</th>
         <td colspan="4">
@@ -153,10 +153,18 @@
     </tr>
     {% for test_suite_summary in details %}
         {% set suite_index = loop.index %}
+        {% set status = test_suite_summary.success %}
+
         <tr>
             <td colspan="2">{{ test_suite_summary.name }}</td>
-            <td style="text-align:center;width:6em;">{{ test_suite_summary.time.duration * 1000 }}毫秒</td>
-            <td class="{{ test_suite_summary.success }}">{{ test_suite_summary.success }}</td>
+            <td style="text-align:center;width:6em;">{{(test_suite_summary.time.duration * 1000)| int }}毫秒</td>
+            <td class="{{ test_suite_summary.success }}">
+                {% if status == 'True' %}
+                    成功
+                {% else %}
+                    失败
+                {% endif %}
+            </td>
         </tr>
         {#    {% for record in test_suite_summary.records %}
         {% set record_index = "{}_{}".format(suite_index, loop.index) %}
