@@ -159,7 +159,7 @@
             <td colspan="2">{{ test_suite_summary.name }}</td>
             <td style="text-align:center;width:6em;">{{(test_suite_summary.time.duration * 1000)| int }}毫秒</td>
             <td class="{{ test_suite_summary.success }}">
-                {% if status == 'True' %}
+                {% if status == True %}
                     成功
                 {% else %}
                     失败
