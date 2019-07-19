@@ -11,5 +11,11 @@ bind = '127.0.0.1:8080'
 
 # 启动的进程数
 # workers = multiprocessing.cpu_count() * 2 + 1
-workers = 1
+workers = 2
+
+# 指定每个工作者的线程数
+threads = 2
 worker_class = 'gunicorn.workers.ggevent.GeventWorker'
+
+# 代码发生变化是否自动重启
+reload = True

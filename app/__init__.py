@@ -1,5 +1,6 @@
 # encoding: utf-8
 import os
+import platform
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
@@ -8,6 +9,8 @@ from config import config_log
 from .util import global_variable  # 初始化文件地址
 from sqlalchemy import MetaData
 from flask_apscheduler import APScheduler
+import atexit
+import fcntl
 
 login_manager = LoginManager()
 # login_manager.session_protection = 'None'
@@ -43,8 +46,10 @@ def create_app(config_name):
     db.create_all()
 
     login_manager.init_app(app)
-    scheduler.init_app(app)
-    scheduler.start()  # 定时任务启动
+    # 启动定时任务
+    scheduler_init(app)
+    #scheduler.init_app(app)
+    #scheduler.start()  # 定时任务启动
 
     from .api_1_0 import api as api_blueprint
     app.register_blueprint(api_blueprint, url_prefix='/api')
@@ -52,3 +57,46 @@ def create_app(config_name):
     # from .api_1_0.model import api_1_0 as api_blueprint
     # app.register_blueprint(api_blueprint, url_prefix='/api_1_0')
     return app
+
+def scheduler_init(app):
+    """
+    保证系统只启动一次定时任务
+    :param app:
+    :return:
+    """
+    print("初始化定时任务")
+    if platform.system() != 'Windows':
+        fcntl = __import__("fcntl")
+        f = open('scheduler.lock', 'wb')
+        try:
+            fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            scheduler.init_app(app)
+            scheduler.start()
+            app.logger.debug('Scheduler Started,---------------')
+        except:
+            pass
+
+        def unlock():
+            fcntl.flock(f, fcntl.LOCK_UN)
+            f.close()
+
+        atexit.register(unlock)
+    else:
+        msvcrt = __import__('msvcrt')
+        f = open('scheduler.lock', 'wb')
+        try:
+            msvcrt.locking(f.fileno(), msvcrt.LK_NBLCK, 1)
+            scheduler.init_app(app)
+            scheduler.start()
+            app.logger.debug('Scheduler Started,----------------')
+        except:
+            pass
+
+        def _unlock_file():
+            try:
+                f.seek(0)
+                msvcrt.locking(f.fileno(), msvcrt.LK_UNLCK, 1)
+            except:
+                pass
+
+        atexit.register(_unlock_file)
