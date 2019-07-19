@@ -130,7 +130,7 @@ def add_task():
     # password = data.get('password')
     # 0 0 1 * * *
     if not (not to_email) and not (to_email):
-        return jsonify({'msg': '发件人必须有值', 'status': 0})
+        return jsonify({'msg': '收件人必须有值', 'status': 0})
 
     time_config = data.get('timeConfig')
     if len(time_config.strip().split(' ')) != 6:
