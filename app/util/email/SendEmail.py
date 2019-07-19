@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 import os
+import json
 import smtplib
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
@@ -10,11 +11,11 @@ from .mail_config import EMAIL_PORT, EMAIL_SERVICE, EMAIL_USER, EMAIL_PWD
 import base64
 from email import encoders
 from config import Config
-
+from ..global_variable import *
+from ..report.report import *
 
 class SendEmail(object):
     _attachments = []
-
     def __init__(self, to_list, name, reportId):
         self.Email_service = EMAIL_SERVICE
         self.Email_port = EMAIL_PORT
@@ -41,33 +42,26 @@ class SendEmail(object):
         self._attachments.append(att)
 
     def send_email(self):
-
-        html = """
-        <html>  
-          <head></head>  
-          <body>  
-            <p>Dear All!<br>  
-                   最新的在线测试报告<a href="http://192.168.0.187/#/manage/reportShow?reportId=%s">link</a>请查阅！<br> 
-        	       附件为离线报告。<br> 
-        		   From测试组
-            </p> 
-          </body>  
-        </html>  
-        """
+        _address = REPORT_ADDRESS + str(self.reportId) + '.txt'
+        with open(_address, 'r') as f:
+            res = json.loads(f.read())
+        d = render_email_report(res, self.reportId)
         # 第三方 SMTP 服务
         message = MIMEMultipart()
-        part = MIMEText(html % self.reportId, 'html', 'utf-8')
+        #part = MIMEText(html % self.reportId, 'html', 'utf-8')
+        part = MIMEText(d, 'html', 'utf-8')
+
         # part = MIMEText(self.file, 'html', 'utf-8')
 
         message.attach(part)
-        message['From'] = Header("王会勇", 'utf-8')
+        message['From'] = Header(self.username, 'utf-8')
         message['To'] = Header(''.join(self.to_list), 'utf-8')
         subject = self.name
         message['Subject'] = Header(subject, 'utf-8')
         file = self.find_new_file(Config.basedir + "/reports")
         att = MIMEText(open(file, 'rb').read(), 'base64', 'utf-8')
         att["Content-Type"] = 'application/octet-stream'
-        att["Content-Disposition"] = 'attachment; filename="report_test.html"'
+        att["Content-Disposition"] = 'attachment; filename="report.html"'
         message.attach(att)
         try:
             # service = smtplib.SMTP()
@@ -76,7 +70,7 @@ class SendEmail(object):
             service = smtplib.SMTP_SSL(self.Email_service, 465)
             service.login(self.username, self.password)
             service.sendmail(self.username, self.to_list, message.as_string())
-            print('邮件发送成功')
+            print('邮件发送成功,接收人员:'+str(self.to_list))
             service.close()
         except Exception as e:
             print(e)

@@ -4,6 +4,7 @@ import importlib
 import json
 import re
 import types
+import socket
 
 
 def auto_num(num, model, **kwargs):
@@ -260,6 +261,13 @@ def convert_str2int(validate):
     return json.dumps(jsonarray)
 
 
+def getIP():
+    # 获取本机电脑名
+    myname = socket.getfqdn(socket.gethostname())
+    # 获取本机ip
+    return socket.gethostbyname(myname)
+
+
 if __name__ == '__main__':
     # func_list = importlib.reload(importlib.import_module(r"func_list.abuild_in_fun.py"))
     # module_functions_dict = {name: item for name, item in vars(func_list).items() if
@@ -267,7 +275,7 @@ if __name__ == '__main__':
     # print(module_functions_dict)
     a = '${func({"birthday": "199-02-02"; "expire_age": "65周岁"; "sex": "2"},123,3245)}'
     b = '${func([123],123)}'
-    print(extract_functions(a))
+    print(getIP())
     # matched = parse_function(extract_functions(b)[0])
     #
     # print(matched)

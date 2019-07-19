@@ -1,0 +1,178 @@
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ html_report_name }} - TestReport</title>
+    <style>
+        body {
+            background-color: #f2f2f2;
+            color: #333;
+            margin: 0 auto;
+            width: 960px;
+        }
+
+        .summary {
+            width: 960px;
+            margin-bottom: 20px;
+            border: 1px;
+        }
+
+        .summary th {
+            background-color: skyblue;
+            padding: 5px 12px;
+        }
+
+        .summary td {
+            background-color: lightblue;
+            text-align: center;
+            padding: 4px 8px;
+        }
+
+        .details {
+            width: 960px;
+            margin-bottom: 20px;
+            table-layout: fixed;
+            word-break: break-word;
+        }
+
+        .details th {
+            background-color: skyblue;
+            padding: 5px 12px;
+        }
+
+        .details tr .passed {
+            background-color: lightgreen;
+        }
+
+        .details tr .failed {
+            background-color: red;
+        }
+
+        .details tr .unchecked {
+            background-color: gray;
+
+        }
+
+        .details td {
+            background-color: lightblue;
+            padding: 5px 12px;
+        }
+
+        .details .detail {
+            background-color: lightgrey;
+            font-size: smaller;
+            padding: 5px 10px;
+            line-height: 20px;
+            text-align: left;
+        }
+
+        .details .success {
+            background-color: greenyellow;
+        }
+
+        .details .error {
+            background-color: red;
+        }
+
+        .details .failure {
+            background-color: salmon;
+        }
+
+        .details .skipped {
+            background-color: gray;
+        }
+
+        .button {
+            font-size: 1em;
+            padding: 6px;
+            width: 4em;
+            text-align: center;
+            background-color: #06d85f;
+            border-radius: 20px/50px;
+            cursor: pointer;
+            transition: all 0.3s ease-out;
+        }
+
+        a.button {
+            color: gray;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .button:hover {
+            background: #2cffbd;
+        }
+
+        .popup h2 {
+            margin-top: 0;
+            color: #333;
+            font-family: Tahoma, Arial, sans-serif;
+        }
+
+        @media screen and (max-width: 700px) {
+            .box {
+                width: 70%;
+            }
+
+            .popup {
+                width: 70%;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+{#<h3 style="text-align:center;">司机宝监控通知</h3>#}
+<table id="summary" class="summary">
+    <tr>
+        <th>开始时间</th>
+        <td colspan="4">{{ time.start_datetime }}</td>
+    </tr>
+    <tr>
+        <th>消耗时间</th>
+        <td colspan="4">{{ '%0.3f'| format(time.duration|float) }} 秒</td>
+    </tr>
+    <tr>
+        <th>在线报告</th>
+        <td colspan="4">
+            <a href="http://192.168.0.187/#/manage/reportShow?reportId={{ reportId }}">http://192.168.0.187/#/manage/reportShow?reportId={{ reportId }}</a>
+        </td>
+    </tr>
+    <tr>
+        <th>执行情况</th>
+        <td>总数：{{ stat.teststeps.total }}</td>
+        <td>成功：{{ stat.teststeps.successes }}</td>
+        <td>失败：{{ stat.teststeps.errors }}</td>
+        {#<td>{{ stat.teststeps.total }}</td>
+        <td>{{ stat.teststeps.successes }}</td>#}
+    </tr>
+</table>
+{% for test_suite_summary in details %}
+    {% set suite_index = loop.index %}
+    <table id="suite_{{ suite_index }}" class="details">
+        {#<tr>
+            <td colspan="2">TOTAL: {{ test_suite_summary.stat.total }}</td>
+            <td>SUCCESS: {{ test_suite_summary.stat.successes }}</td>-
+            <td>FAILED: {{ test_suite_summary.stat.failures }}</td>
+            <td>ERROR: {{ test_suite_summary.stat.errors }}</td>
+        </tr>#}
+        <tr>
+            <th colspan="2">Name</th>
+            <th>Response Time</th>
+            <th>Status</th>
+            <th>Error Msg</th>
+        </tr>
+
+        {% for record in test_suite_summary.records %}
+            {% set record_index = "{}_{}".format(suite_index, loop.index) %}
+            {% set record_meta_datas = record.meta_datas_expanded %}
+            <tr id="record_{{ record_index }}">
+                <td colspan="2">{{ record.name }}</td>
+                <td style="text-align:center;width:6em;">{{ record.response_time }} ms</td>
+                <th class="{{ record.status }}" style="width:5em;">{{ record.status }}</th>
+                <td>{{ record.attachment }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endfor %}
+</body>

@@ -259,7 +259,7 @@ class RunCase(object):
                         _steps['teststeps'].append(self.assemble_step(None, _step, self.pro_base_url, True))
                 self.TEST_DATA['testcases'].append(_steps)
 
-    def build_report(self, jump_res, case_ids, performer='无'):
+    def build_report(self, jump_res, case_ids, performer='无',):
 
         new_report = Report(
             case_names=','.join([Case.query.filter_by(id=scene_id).first().name for scene_id in case_ids]),
