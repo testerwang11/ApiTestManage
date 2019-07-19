@@ -64,7 +64,6 @@ def scheduler_init(app):
     :param app:
     :return:
     """
-    print("初始化定时任务")
     if platform.system() != 'Windows':
         fcntl = __import__("fcntl")
         f = open('scheduler.lock', 'wb')
