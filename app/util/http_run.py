@@ -200,8 +200,8 @@ class RunCase(object):
         :param config_id: 配置id
         :return:
         """
-        #scheduler.app.logger.info('本次测试的接口id：{}'.format(api_ids))
-        current_app.logger.info('本次测试的接口id：{}'.format(api_ids))
+        scheduler.app.logger.info('本次测试的接口id：{}'.format(api_ids))
+        #current_app.logger.info('本次测试的接口id：{}'.format(api_ids))
         _steps = {'teststeps': [], 'config': {'variables': {}}, 'output': ['phone']}
 
         if project_id:
@@ -239,8 +239,8 @@ class RunCase(object):
         :param case_ids: 用例id列表
         :return:
         """
-        #scheduler.app.logger.info('本次测试的用例id：{}'.format(case_ids))
-        current_app.logger.info('本次测试的用例id：{}'.format(case_ids))
+        scheduler.app.logger.info('本次测试的用例id：{}'.format(case_ids))
+        #print('本次测试的用例id：{}'.format(case_ids))
 
         for case_id in case_ids:
             case_data = Case.query.filter_by(id=case_id).first()
@@ -278,8 +278,8 @@ class RunCase(object):
         return new_report.id
 
     def run_case(self):
-        #scheduler.app.logger.info('测试数据：{}'.format(self.TEST_DATA))
-        current_app.logger.info('测试数据：{}'.format(self.TEST_DATA))
+        scheduler.app.logger.info('测试数据：{}'.format(self.TEST_DATA))
+        #current_app.logger.info('测试数据：{}'.format(self.TEST_DATA))
 
         # res = main_ate(self.TEST_DATA)
         """失败终止测试"""
