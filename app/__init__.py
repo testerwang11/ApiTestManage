@@ -47,9 +47,9 @@ def create_app(config_name):
 
     login_manager.init_app(app)
     # 启动定时任务
-    #scheduler_init(app)
-    scheduler.init_app(app)
-    scheduler.start()  # 定时任务启动
+    scheduler_init(app)
+    #cheduler.init_app(app)
+    #scheduler.start()  # 定时任务启动
 
     from .api_1_0 import api as api_blueprint
     app.register_blueprint(api_blueprint, url_prefix='/api')
