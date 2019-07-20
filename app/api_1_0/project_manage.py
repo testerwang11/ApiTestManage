@@ -25,8 +25,12 @@ def getUserName2(users):
 def get_pro_gather():
     """ 获取基本信息 """
     # if current_user.id == 4:
-    _pros = Project.query.order_by('CASE WHEN user_id={} THEN 0 END DESC'.format(current_user.id)).all()
-    my_pros = Project.query.filter_by(user_id=current_user.id).first()
+    current_user_name = User.query.filter_by(id=current_user.id).first().name
+    print(current_user_name)
+    #_pros = Project.query.order_by('CASE WHEN user_id in {} THEN 0 END DESC'.format(current_user_name)).all()
+    _pros = Project.query.filter(Project.user_id.ilike('%'+current_user_name+'%'))
+
+    my_pros = Project.query.filter(Project.user_id.ilike('%'+current_user_name+'%')).first()
     pro = {}
     pro_and_id = []
     pro_url = {}

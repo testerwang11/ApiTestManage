@@ -22,12 +22,12 @@ def add_case():
     project_data = Project.query.filter_by(name=project).first()
     project_id = project_data.id
     variable = data.get('variable')
-    #类型转换
-    #variable = convert_str2int(data.get('variable'))
-
     api_cases = data.get('apiCases')
     merge_variable = json.dumps(json.loads(variable) + json.loads(project_data.variables))
     _temp_check = extract_variables(convert(json.loads(merge_variable)))
+    current_user_name = User.query.filter_by(id=current_user.id).first().name
+    if current_user_name not in Project.query.filter_by(id=project_id).first().user_id:
+        return jsonify({'msg': '不能操作别人项目用例', 'status': 0})
     if not case_set_id:
         return jsonify({'msg': '请选择用例集', 'status': 0})
     if re.search('\${(.*?)}', '{}{}'.format(variable, json.dumps(api_cases)), flags=0) and not func_address:
@@ -171,7 +171,9 @@ def del_case():
     data = request.json
     case_id = data.get('caseId')
     wait_del_case_data = Case.query.filter_by(id=case_id).first()
-    if current_user.id != Project.query.filter_by(id=wait_del_case_data.project_id).first().user_id:
+    current_user_name = User.query.filter_by(id=current_user.id).first().name
+
+    if current_user_name.id not in Project.query.filter_by(id=wait_del_case_data.project_id).first().user_id:
         return jsonify({'msg': '不能删除别人项目下的用例', 'status': 0})
 
     _del_data = CaseData.query.filter_by(case_id=case_id).all()
