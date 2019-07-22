@@ -8,7 +8,7 @@ from ..util.utils import encode_object
 import importlib
 from app import scheduler
 from flask.json import JSONEncoder
-from flask import current_app
+#from flask import current_app
 
 
 class RunCase(object):
@@ -231,8 +231,6 @@ class RunCase(object):
             _config = json.loads(config_data.variables_four) if project_id else []
         return _config
 
-
-
     def get_case_test(self, case_ids):
         """
         用例调试时，用到的方法
@@ -240,7 +238,8 @@ class RunCase(object):
         :return:
         """
         scheduler.app.logger.info('本次测试的用例id：{}'.format(case_ids))
-        #print('本次测试的用例id：{}'.format(case_ids))
+        #current_app.logger.info('本次测试的用例id：{}'.format(case_ids))
+        # print('本次测试的用例id：{}'.format(case_ids))
 
         for case_id in case_ids:
             case_data = Case.query.filter_by(id=case_id).first()
@@ -263,12 +262,13 @@ class RunCase(object):
                         _steps['teststeps'].append(self.assemble_step(None, _step, self.pro_base_url, True))
                 self.TEST_DATA['testcases'].append(_steps)
 
-    def build_report(self, jump_res, case_ids, performer='无',):
+    def build_report(self, jump_res, case_ids, performer='无', taskName='无'):
 
         new_report = Report(
             case_names=','.join([Case.query.filter_by(id=scene_id).first().name for scene_id in case_ids]),
             project_id=self.project_ids, read_status='待阅', performer=performer,
-            environment_choice=self.environment_choice)
+            environment_choice=self.environment_choice,
+            task_name=taskName)
         db.session.add(new_report)
         db.session.commit()
 

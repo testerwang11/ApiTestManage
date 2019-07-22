@@ -13,9 +13,13 @@ from email import encoders
 from config import Config
 from ..global_variable import *
 from ..report.report import *
+from app import scheduler
+from flask import current_app
+
 
 class SendEmail(object):
     _attachments = []
+
     def __init__(self, to_list, name, reportId):
         self.Email_service = EMAIL_SERVICE
         self.Email_port = EMAIL_PORT
@@ -48,7 +52,7 @@ class SendEmail(object):
         d = render_email_report(res, self.reportId)
         # 第三方 SMTP 服务
         message = MIMEMultipart()
-        #part = MIMEText(html % self.reportId, 'html', 'utf-8')
+        # part = MIMEText(html % self.reportId, 'html', 'utf-8')
         part = MIMEText(d, 'html', 'utf-8')
 
         # part = MIMEText(self.file, 'html', 'utf-8')
@@ -71,10 +75,14 @@ class SendEmail(object):
             service.login(self.username, self.password)
             service.sendmail(self.username, self.to_list, message.as_string())
             print('邮件发送成功,接收人员:'+str(self.to_list))
+            #current_app.logger.info('邮件发送成功,接收人员{}'.format(self.to_list))
+
             service.close()
         except Exception as e:
-            print(e)
-            print('报错，邮件发送失败')
+             print(e)
+             print('报错，邮件发送失败')
+            #current_app.logger.error(e)
+            #current_app.logger.error("报错，邮件发送失败")
 
     def find_new_file(self, dir):
         '''查找目录下最新的文件'''
@@ -84,7 +92,7 @@ class SendEmail(object):
         else 0)
         # print('最新的文件为： ' + file_lists[-1])
         file = os.path.join(dir, file_lists[-1])
-        print('完整文件路径：', file)
+        # print('完整文件路径：', file)
         return file
 
 

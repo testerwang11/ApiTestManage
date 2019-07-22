@@ -1,4 +1,5 @@
 import json
+
 from flask import jsonify, request
 from . import api
 from app.models import Project, Task, CaseSet, Case, db, User
@@ -11,6 +12,8 @@ from ..util.report.report import render_html_report
 from flask_login import current_user
 from ..util.global_variable import *
 import time
+from flask import current_app
+from apscheduler.job import Job
 
 
 def aps_test(project_id, case_ids, task_to_address=None, performer='无', taskName=None, noticeType=None, env='first',
@@ -27,7 +30,7 @@ def aps_test(project_id, case_ids, task_to_address=None, performer='无', taskNa
     while i < maxTimes:
         jump_res = d.run_case()
         """报告写入数据库"""
-        reportId = d.build_report(jump_res, case_ids, performer)
+        reportId = d.build_report(jump_res, case_ids, performer, taskName)
         res = json.loads(jump_res)
         fsize = res['stat']['testcases']['fail']
         res['html_report_name'] = taskName
@@ -36,7 +39,8 @@ def aps_test(project_id, case_ids, task_to_address=None, performer='无', taskNa
             break
         """如果是重试模式则，等待"""
         if retry:
-            print("第次"+str(i)+"重试，等待:"+str(FAIL_WAIT)+"秒")
+            print("第次" + str(i) + "重试，等待:" + str(FAIL_WAIT) + "秒")
+            # current_app.logger.info("第次" + str(i) + "重试，等待:" + str(FAIL_WAIT) + "秒")
             time.sleep(FAIL_WAIT)
         i = i + 1
 
@@ -172,7 +176,8 @@ def add_task():
                             task_to_email_address=to_email,
                             task_config_time=time_config,
                             num=num,
-                            environment_choice=environment)
+                            environment_choice=environment,
+                            notice_type=notice_type)
             db.session.add(new_task)
             db.session.commit()
             return jsonify({'msg': '新建成功', 'status': 1})
@@ -196,10 +201,11 @@ def edit_task():
 @api.route('/task/find', methods=['POST'])
 @login_required
 def find_task():
-    """ 查找任务信息 """
+    """ 查找任务信息列表 """
     data = request.json
     project_name = data.get('projectName')
-    project_id = Project.query.filter_by(name=project_name).first().id
+    if project_name:
+        project_id = Project.query.filter_by(name=project_name).first().id
     task_name = data.get('taskName')
     page = data.get('page') if data.get('page') else 1
     per_page = data.get('sizePage') if data.get('sizePage') else 10
@@ -209,11 +215,15 @@ def find_task():
         if not _data:
             return jsonify({'msg': '没有该任务', 'status': 0})
     else:
-        tasks = Task.query.filter_by(project_id=project_id)
+        if project_name:
+            tasks = Task.query.filter_by(project_id=project_id)
+        else:
+            tasks = Task.query
         pagination = tasks.order_by(Task.id.asc()).paginate(page, per_page=per_page, error_out=False)
         _data = pagination.items
         total = pagination.total
-    task = [{'task_name': c.task_name, 'task_config_time': c.task_config_time,
+    task = [{'project_name': Project.query.filter_by(id=c.project_id).first().name, 'task_name': c.task_name,
+             'task_config_time': c.task_config_time,
              'id': c.id, 'task_type': c.task_type, 'status': c.status, 'environment': c.environment_choice,
              'notice_type': c.notice_type} for c in _data]
     return jsonify({'data': task, 'total': total, 'status': 1})

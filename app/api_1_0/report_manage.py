@@ -23,7 +23,7 @@ def run_cases():
     # run_case = RunCase(data.get('projectName'), data.get('sceneIds'))
 
     project_id = Project.query.filter_by(name=data.get('projectName')).first().id
-    d = RunCase(project_id,envValue)
+    d = RunCase(project_id, envValue)
     d.get_case_test(case_ids)
     jump_res = d.run_case()
 
@@ -103,22 +103,27 @@ def del_report():
 @api.route('/report/find', methods=['POST'])
 @login_required
 def find_report():
-    """ 查找报告 """
+    """ 查找报告列表 """
     data = request.json
     project_name = data.get('projectName')
-    project_id = Project.query.filter_by(name=project_name).first().id
+    if project_name:
+        project_id = Project.query.filter_by(name=project_name).first().id
+        report_data = Report.query.filter_by(project_id=project_id)
+    else:
+        report_data = Report.query
     page = data.get('page') if data.get('page') else 1
     per_page = data.get('sizePage') if data.get('sizePage') else 10
 
-    report_data = Report.query.filter_by(project_id=project_id)
     pagination = report_data.order_by(Report.create_time.desc()).paginate(page, per_page=per_page, error_out=False)
     report = pagination.items
     total = pagination.total
-    report = [{'name': c.case_names, 'project_name': project_name, 'id': c.id, 'read_status': c.read_status,
+    report = [{'name': c.case_names, 'project_name': Project.query.filter_by(id=c.project_id).first().name, 'id': c.id, 'read_status': c.read_status,
                'performer': c.performer,
+               'taskName': c.task_name,
                'envData': envTrans(c.environment_choice),
                'create_time': str(c.create_time).split('.')[0]} for c in report]
     return jsonify({'data': report, 'total': total, 'status': 1})
+
 
 def envTrans(env):
     str = "测试环境"

@@ -695,7 +695,7 @@ TEMP_REPORT = os.path.abspath('.') + r'/app/util/report'
 FUNC_ADDRESS = os.path.abspath('.') + r'/func_list'
 FILE_ADDRESS = os.path.abspath('..') + r'/files/'
 FAIL_RETRY_TIMES = 3
-FAIL_WAIT = 10
+FAIL_WAIT = 15
 
 
 def _check_file_path():
