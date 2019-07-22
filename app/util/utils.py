@@ -264,8 +264,20 @@ def convert_str2int(validate):
 def getIP():
     # 获取本机电脑名
     myname = socket.getfqdn(socket.gethostname())
-    # 获取本机ip
+    # 获取本机ipd
     return socket.gethostbyname(myname)
+
+def envTrans(env):
+    str = "测试环境"
+    if env == 'first':
+        str = "测试环境"
+    if env == 'second':
+        str = "开发环境"
+    if env == 'third':
+        str = "生产环境"
+    if env == 'fourth':
+        str = "准生产环境"
+    return str
 
 
 if __name__ == '__main__':

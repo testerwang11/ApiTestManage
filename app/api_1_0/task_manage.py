@@ -12,6 +12,8 @@ from ..util.report.report import render_html_report
 from flask_login import current_user
 from ..util.global_variable import *
 import time
+from ..util.utils import *
+
 from flask import current_app
 from apscheduler.job import Job
 
@@ -224,7 +226,7 @@ def find_task():
         total = pagination.total
     task = [{'project_name': Project.query.filter_by(id=c.project_id).first().name, 'task_name': c.task_name,
              'task_config_time': c.task_config_time,
-             'id': c.id, 'task_type': c.task_type, 'status': c.status, 'environment': c.environment_choice,
+             'id': c.id, 'task_type': c.task_type, 'status': c.status, 'environment': envTrans(c.environment_choice),
              'notice_type': c.notice_type} for c in _data]
     return jsonify({'data': task, 'total': total, 'status': 1})
 
