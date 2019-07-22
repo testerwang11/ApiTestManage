@@ -195,7 +195,8 @@ def edit_task():
     _data = {'num': c.num, 'task_name': c.task_name, 'task_config_time': c.task_config_time, 'task_type': c.task_type,
              'set_ids': json.loads(c.set_id), 'case_ids': json.loads(c.case_id),
              'task_to_email_address': c.task_to_email_address, 'task_send_email_address': c.task_send_email_address,
-             'password': c.email_password, 'notice_type': c.notice_type, 'environment': c.environment_choice}
+             'password': c.email_password, 'notice_type': c.notice_type, 'environment': c.environment_choice,
+             'project_name': Project.query.filter_by(id=c.project_id).first().name}
 
     return jsonify({'data': _data, 'status': 1})
 
