@@ -173,7 +173,7 @@ def del_case():
     wait_del_case_data = Case.query.filter_by(id=case_id).first()
     current_user_name = User.query.filter_by(id=current_user.id).first().name
 
-    if current_user_name.id not in Project.query.filter_by(id=wait_del_case_data.project_id).first().user_id:
+    if current_user_name not in Project.query.filter_by(id=wait_del_case_data.project_id).first().user_id:
         return jsonify({'msg': '不能删除别人项目下的用例', 'status': 0})
 
     _del_data = CaseData.query.filter_by(case_id=case_id).all()
