@@ -245,19 +245,19 @@ def convert_str2int(validate):
     comparators = ['less_than', 'less_than_or_equals', 'greater_than', 'greater_than_or_equals', 'equals',
                    'length_equals', 'length_greater_than', 'length_less_than', 'length_less_than_or_equals',
                    'count_greater_than_or_equals']
-    i = 0
-    for js in jsonarray:
-        if (js['key'] != None):
-            comparator = js['comparator']
+
+    for i in range(0, len(jsonarray)):
+        print(i, jsonarray[i])
+        if jsonarray[i]['key'] != None:
+            comparator = jsonarray[i]['comparator']
             """比较运算期望值转为int"""
             if comparator in comparators:
                 print("检查:" + comparator)
-                js['value'] = int(js['value'])
-                jsonarray.pop(i)
-                jsonarray.append(js)
+                jsonarray[i]['value'] = int(jsonarray[i]['value'])
+                #jsonarray.append(jsonarray[i])
         else:
+            print("移除")
             jsonarray.pop(i)
-        i = i + 1
     return json.dumps(jsonarray)
 
 
@@ -266,6 +266,7 @@ def getIP():
     myname = socket.getfqdn(socket.gethostname())
     # 获取本机ipd
     return socket.gethostbyname(myname)
+
 
 def envTrans(env):
     str = "测试环境"
