@@ -109,6 +109,7 @@ def edit_api_msg():
     data = request.json
     case_id = data.get('apiMsgId')
     _edit = ApiMsg.query.filter_by(id=case_id).first()
+
     _data = {'name': _edit.name, 'num': _edit.num, 'desc': _edit.desc, 'url': _edit.url,
              'method': _edit.method, 'status_url': int(_edit.status_url),
              'up_func': _edit.up_func, 'down_func': _edit.down_func,
@@ -118,7 +119,7 @@ def edit_api_msg():
              'variable': json.loads(_edit.variable),
              'json_variable': _edit.json_variable,
              'extract': json.loads(_edit.extract),
-             'validate': json.loads(_edit.validate)}
+             'validate': convert_str2int(_edit.validate)}
     return jsonify({'data': _data, 'status': 1})
 
 
