@@ -119,7 +119,9 @@ def edit_api_msg():
              'variable': json.loads(_edit.variable),
              'json_variable': _edit.json_variable,
              'extract': json.loads(_edit.extract),
-             'validate': convert_str2int(_edit.validate)}
+            # 'validate': convert_str2int(_edit.validate)}
+            'validate': json.loads(_edit.validate)}
+
     return jsonify({'data': _data, 'status': 1})
 
 
