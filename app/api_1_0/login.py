@@ -4,6 +4,7 @@ from app.models import *
 import json
 from flask_login import login_user, logout_user
 from ..util.custom_decorator import *
+from ..util.login_ldap import *
 
 
 @api.route('/register', methods=['POST'])
@@ -89,19 +90,35 @@ def login():
         data = json.loads(data)
     account = data.get('account')
     password = data.get('password')
-    user = User.query.filter_by(account=account).first()
-    if user is None:
-        return jsonify({'msg': '账号错误或不存在', 'status': 0})
-    elif not user.verify_password(password):
-        return jsonify({'msg': '密码错误', 'status': 0})
-    elif user.status == 0:
-        return jsonify({'msg': '该账号被冻结', 'status': 0})
+    if "." in account:
+        '''LDAP账号'''
+        print('ladp登录')
+        user = User.query.filter_by(account=account).first()
+        if user is None:
+            user = User(name=account, account=account, status=1, role_id=1)
+        if ldap_login(account, password):
+            db.session.add(user)
+            db.session.commit()
+            user = User.query.filter_by(account=account).first()
+        else:
+            return jsonify({'msg': '账号或密码错误!!!', 'status': 0})
     else:
-        login_user(user, True)
-        token = user.generate_reset_token()
-        token = bytes.decode(token)
-        return jsonify({'msg': '登录成功', 'status': 1, 'token': token,
-                        'name': user.name, 'userId': user.id, 'roles': str(user.role_id)})
+        '''自有账号登录'''
+        print('自有登录')
+        user = User.query.filter_by(account=account).first()
+        if user is None:
+            return jsonify({'msg': '账号错误或不存在', 'status': 0})
+        elif not user.verify_password(password):
+            return jsonify({'msg': '密码错误', 'status': 0})
+        elif user.status == 0:
+            return jsonify({'msg': '该账号被冻结', 'status': 0})
+        else:
+            login_user(user, True)
+    login_user(user, True)
+    token = user.generate_reset_token()
+    token = bytes.decode(token)
+    return jsonify({'msg': '登录成功', 'status': 1, 'token': token,
+                    'name': user.name, 'userId': user.id, 'roles': str(user.role_id)})
 
 
 @api.route('/user/find', methods=['POST'])
@@ -137,7 +154,6 @@ def edit_user():
     user_id = data.get('id')
     _edit = User.query.filter_by(id=user_id).first()
     _data = {'account': _edit.account, 'name': _edit.name, 'role_id': _edit.role_id}
-
     return jsonify({'data': _data, 'status': 1})
 
 
