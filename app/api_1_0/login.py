@@ -185,3 +185,24 @@ def change_status_user():
         _edit.status = 1
         db.session.commit()
         return jsonify({'msg': '恢复成功', 'status': 1})
+
+
+@api.route('/user/changeNormalProject', methods=['POST'])
+@login_required
+def change_normal_porject():
+    """修改用户常用项目"""
+    data = request.json
+    project_id = data.get('project_id')
+    User.query.filter(User.id == current_user.id).update({'project_id': project_id})
+    db.session.commit()
+    return jsonify({'msg': '修改成功', 'status': 1})
+
+
+@api.route('/user/queryProjects', methods=['POST'])
+@login_required
+def get_projects():
+    _data = Project.query.order_by(Project.id.asc()).all()
+    projects = [{'project_name': c.name,
+                 'project_id': c.id
+                 } for c in _data]
+    return jsonify({'projects': projects})

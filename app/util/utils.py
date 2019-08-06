@@ -5,7 +5,7 @@ import json
 import re
 import types
 import socket
-
+from app.models import *
 
 def auto_num(num, model, **kwargs):
     """自动返回编号的最大值"""
@@ -281,6 +281,7 @@ def envTrans(env):
     return str
 
 
+
 if __name__ == '__main__':
     # func_list = importlib.reload(importlib.import_module(r"func_list.abuild_in_fun.py"))
     # module_functions_dict = {name: item for name, item in vars(func_list).items() if
@@ -288,7 +289,8 @@ if __name__ == '__main__':
     # print(module_functions_dict)
     a = '${func({"birthday": "199-02-02"; "expire_age": "65周岁"; "sex": "2"},123,3245)}'
     b = '${func([123],123)}'
-    print(getIP())
+    #print(getIP())
     # matched = parse_function(extract_functions(b)[0])
     #
     # print(matched)
+    print(extract_variables("Cookies"))

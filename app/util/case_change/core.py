@@ -68,6 +68,7 @@ class HarParser(object):
         request_params = convert_list_to_dict(entry_json["request"].get("queryString", []))
 
         url = entry_json["request"].get("url")
+        description = entry_json["description"]
         if not url:
             logging.exception("url missed in request.")
             sys.exit(1)
@@ -78,10 +79,12 @@ class HarParser(object):
 
         testcase_dict["status_url"] = parsed_object.netloc
         testcase_dict["url"] = parsed_object.path
-        testcase_dict["name"] = parsed_object.path
+        testcase_dict["name"] = description
+        #testcase_dict['description'] = description
 
     def _make_json_data(self, testcase_dict, entry_json):
         testcase_dict['name'] = entry_json['name']
+
         testcase_dict['method'] = entry_json['method']
         if not entry_json['url'].startswith('http'):
             entry_json['url'] = 'http://' + entry_json['url']
@@ -140,12 +143,11 @@ class HarParser(object):
                 post_data = text
             else:
                 post_data = convert_list_to_dict(params)
-
             request_data_key = "data"
             if not mimeType:
                 pass
             elif mimeType.startswith("application/json"):
-                post_data = json.loads(post_data)
+                post_data = json.loads(str(post_data))
                 request_data_key = "json"
             elif mimeType.startswith("application/x-www-form-urlencoded"):
                 # post_data = utils.x_www_form_urlencoded(post_data)
@@ -201,5 +203,5 @@ class HarParser(object):
 
 
 if __name__ == '__main__':
-    har_parser = HarParser('test.har')
+    har_parser = HarParser('D:/Temp/1.har')
     print(har_parser.testset)

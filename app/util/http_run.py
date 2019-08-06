@@ -3,12 +3,10 @@ import types
 from app.models import *
 from httprunner.api import HttpRunner
 from ..util.global_variable import *
-from ..util.httprunner_change import *
 from ..util.utils import encode_object
 import importlib
 from app import scheduler
 from flask.json import JSONEncoder
-#from flask import current_app
 
 
 class RunCase(object):
@@ -201,7 +199,6 @@ class RunCase(object):
         :return:
         """
         scheduler.app.logger.info('本次测试的接口id：{}'.format(api_ids))
-        #current_app.logger.info('本次测试的接口id：{}'.format(api_ids))
         _steps = {'teststeps': [], 'config': {'variables': {}}, 'output': ['phone']}
 
         if project_id:
@@ -238,7 +235,6 @@ class RunCase(object):
         :return:
         """
         scheduler.app.logger.info('本次测试的用例id：{}'.format(case_ids))
-        #current_app.logger.info('本次测试的用例id：{}'.format(case_ids))
         # print('本次测试的用例id：{}'.format(case_ids))
 
         for case_id in case_ids:
@@ -279,8 +275,6 @@ class RunCase(object):
 
     def run_case(self):
         scheduler.app.logger.info('测试数据：{}'.format(self.TEST_DATA))
-        #current_app.logger.info('测试数据：{}'.format(self.TEST_DATA))
-
         # res = main_ate(self.TEST_DATA)
         """失败终止测试"""
         runner = HttpRunner(failfast=False)

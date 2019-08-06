@@ -6,31 +6,21 @@ from ..util.custom_decorator import login_required
 from flask_login import current_user
 
 
-def getUserName(users):
-    users2 = json.loads(users)
-    names = ''
-    for user in users2:
-        names += user['user_name']+','
-    return names
-
-def getUserName2(users):
-    users2 = json.loads(users)
-    names = ''
-    for user in users2:
-        names += user+','
-    return names
-
 @api.route('/proGather/list')
 @login_required
 def get_pro_gather():
     """ 获取基本信息 """
     # if current_user.id == 4:
-    current_user_name = User.query.filter_by(id=current_user.id).first().name
-    print(current_user_name)
-    #_pros = Project.query.order_by('CASE WHEN user_id in {} THEN 0 END DESC'.format(current_user_name)).all()
-    _pros = Project.query.filter(Project.user_id.ilike('%'+current_user_name+'%'))
-
-    my_pros = Project.query.filter(Project.user_id.ilike('%'+current_user_name+'%')).first()
+    # current_user_name = User.query.filter_by(id=current_user.id).first().name
+    # _pros = Project.query.order_by('CASE WHEN user_id in {} THEN 0 END DESC'.format(current_user_name)).all()
+    # _pros = Project.query.filter(Project.user_id.ilike('%' + current_user.id + '%'))
+    # my_pros = Project.query.filter(Project.user_id.ilike('%' + current_user.id + '%')).first()
+    _pros = Project.query.all()
+    comm_project_id = User.query.filter(User.id == current_user.id).first().project_id
+    if comm_project_id:
+        my_pros = Project.query.filter(Project.id == comm_project_id).first()
+    else:
+        my_pros = Project.query.first()
     pro = {}
     pro_and_id = []
     pro_url = {}
@@ -94,17 +84,19 @@ def find_project():
         pagination = Project.query.order_by(Project.id.asc()).paginate(page, per_page=per_page, error_out=False)
         _data = pagination.items
         total = pagination.total
+
     project = [{'id': c.id,
                 'host': c.host,
                 'name': c.name,
                 'choice': c.environment_choice,
                 # 'principal': User.query.filter_by(id=c.user_id).first().name,
                 'principal': c.user_id,
-                'principal2': getUserName2(c.user_id),
+                'principal2': get_user_name(c.user_id),
                 'createTime': str(c.created_time).split('.')[0],
                 'updateTime': str(c.update_time).split('.')[0],
                 'host_two': c.host_two, 'host_three': c.host_three, 'host_four': c.host_four} for c in _data]
     return jsonify({'data': project, 'total': total, 'status': 1, 'userData': user_data})
+
 
 @api.route('/project/add', methods=['POST'])
 @login_required
@@ -119,6 +111,11 @@ def add_project():
 
     if not user_ids:
         return jsonify({'msg': '请选择负责人', 'status': 0})
+    '''将用户名称转为用户ID'''
+    '''user_ids2 = []
+    for user_n in user_ids:
+        user_id = User.query.filter(User.name == user_n).first().id
+        user_ids2.append(user_id)'''
     # principal = data.get('principal')
     environment_choice = data.get('environmentChoice')
     host = json.dumps(data.get('host'))
@@ -201,3 +198,12 @@ def edit_project():
              'environment_choice': _edit.environment_choice,
              'variables': json.loads(_edit.variables)}
     return jsonify({'data': _data, 'status': 1})
+
+
+def get_user_name(user_ids):
+    names = []
+    i = 0
+    for id in json.loads(user_ids):
+        names.append(User.query.filter_by(id=id).first().name + ",")
+        i = i + 1
+    return names

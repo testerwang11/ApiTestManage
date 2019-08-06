@@ -36,6 +36,7 @@ Jinja2==2.10
 JPype1==0.6.3
 jsonpath==0.82
 lxml==4.2.5
+ldap3==2.6
 Mako==1.0.10
 MarkupSafe==1.1.0
 msgpack-python==0.5.6

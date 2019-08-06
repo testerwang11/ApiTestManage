@@ -21,6 +21,9 @@ def add_scene_config():
     variables_three = data.get('variables_three')
     variables_four = data.get('variables_four')
 
+    if str(current_user.id) not in Project.query.filter_by(id=project_id).first().user_id:
+        return jsonify({'msg': '不能修改别人项目下的配置', 'status': 0})
+
     if not project_name:
         return jsonify({'msg': '请选择项目', 'status': 0})
     if re.search('\${(.*?)}', variables, flags=0) and not func_address:
@@ -44,6 +47,7 @@ def add_scene_config():
         old_data.variables_two = variables_two
         old_data.variables_three = variables_three
         old_data.variables_four = variables_four
+        old_data.user_id = current_user.id
         db.session.commit()
         return jsonify({'msg': '修改成功', 'status': 1})
     else:
@@ -54,7 +58,7 @@ def add_scene_config():
             new_config = Config(name=name, variables=variables, variables_two=variables_two,
                                 variables_three=variables_three,
                                 variables_four=variables_four, project_id=project_id, num=num,
-                                func_address=func_address)
+                                func_address=func_address, user_id=current_user.id)
             db.session.add(new_config)
             db.session.commit()
             return jsonify({'msg': '新建成功', 'status': 1})
@@ -83,7 +87,10 @@ def find_config():
         pagination = _config.order_by(Config.num.asc()).paginate(page, per_page=per_page, error_out=False)
         _config = pagination.items
         total = pagination.total
-    _config = [{'name': c.name, 'id': c.id, 'num': c.num, 'func_address': c.func_address} for c in _config]
+    _config = [{'name': c.name, 'id': c.id, 'num': c.num, 'func_address': c.func_address,
+                'create_time': str(c.created_time).split('.')[0],
+                'update_time': str(c.update_time).split('.')[0],
+                'owner': User.query.filter(User.id == c.user_id).first().name} for c in _config]
     return jsonify({'data': _config, 'total': total, 'status': 1})
 
 
@@ -94,9 +101,9 @@ def del_config():
     data = request.json
     ids = data.get('id')
     _edit = Config.query.filter_by(id=ids).first()
-    current_user_name = User.query.filter_by(id=current_user.id).first().name
+    # current_user_name = User.query.filter_by(id=current_user.id).first().name
 
-    if current_user_name not in Project.query.filter_by(id=_edit.project_id).first().user_id:
+    if current_user.id not in Project.query.filter_by(id=_edit.project_id).first().user_id:
         return jsonify({'msg': '不能删除别人项目下的配置', 'status': 0})
     db.session.delete(_edit)
     return jsonify({'msg': '删除成功', 'status': 1})

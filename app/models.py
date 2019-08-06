@@ -58,6 +58,8 @@ class User(UserMixin, db.Model):
     role = db.relationship('Role', back_populates='users')
     created_time = db.Column(db.DateTime, index=True, default=datetime.now)
     update_time = db.Column(db.DateTime, index=True, default=datetime.now, onupdate=datetime.now)
+    project_id = db.Column(db.Integer(), nullable=True, comment='常用项目id')
+
 
     @staticmethod
     def init_user():
@@ -138,6 +140,8 @@ class Config(db.Model):
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'), comment='所属的项目id')
     created_time = db.Column(db.DateTime, index=True, default=datetime.now, comment='创建时间')
     update_time = db.Column(db.DateTime, index=True, default=datetime.now, onupdate=datetime.now)
+    user_id = db.Column(db.Integer(), nullable=True, comment='所属的用户id')
+
 
 
 class CaseSet(db.Model):
@@ -164,6 +168,7 @@ class Case(db.Model):
     case_set_id = db.Column(db.Integer, db.ForeignKey('case_set.id'), comment='所属的用例集id')
     created_time = db.Column(db.DateTime, index=True, default=datetime.now, comment='创建时间')
     update_time = db.Column(db.DateTime, index=True, default=datetime.now, onupdate=datetime.now)
+    user_id = db.Column(db.Integer(), nullable=True, comment='所属的用户id')
 
 
 class ApiMsg(db.Model):
@@ -188,6 +193,7 @@ class ApiMsg(db.Model):
     project_id = db.Column(db.Integer, nullable=True, comment='所属的项目id')
     created_time = db.Column(db.DateTime, index=True, default=datetime.now)
     update_time = db.Column(db.DateTime, index=True, default=datetime.now, onupdate=datetime.now)
+    user_id = db.Column(db.Integer(), nullable=True, comment='所属的用户id')
 
 
 class CaseData(db.Model):
@@ -214,12 +220,14 @@ class CaseData(db.Model):
     api_msg_id = db.Column(db.Integer, db.ForeignKey('api_msg.id'))
     created_time = db.Column(db.DateTime, index=True, default=datetime.now)
     update_time = db.Column(db.DateTime, index=True, default=datetime.now, onupdate=datetime.now)
+    user_id = db.Column(db.Integer(), nullable=True, comment='所属的用户id')
+
 
 
 class Report(db.Model):
     __tablename__ = 'report'
     id = db.Column(db.Integer(), primary_key=True, comment='主键，自增')
-    case_names = db.Column(db.String(128), nullable=True, comment='用例的名称集合')
+    case_names = db.Column(db.String(2048), nullable=True, comment='用例的名称集合')
     read_status = db.Column(db.String(16), nullable=True, comment='阅读状态')
     project_id = db.Column(db.String(16), nullable=True)
     performer = db.Column(db.String(16), comment='执行者')
@@ -247,6 +255,8 @@ class Task(db.Model):
     notice_type = db.Column(db.String(10), comment='邮件提醒方式')
     created_time = db.Column(db.DateTime(), default=datetime.now, comment='任务的创建时间')
     update_time = db.Column(db.DateTime, index=True, default=datetime.now, onupdate=datetime.now)
+    user_id = db.Column(db.Integer(), nullable=True, comment='所属的用户id')
+
 
 
 @login_manager.user_loader

@@ -31,8 +31,8 @@ def add_api_msg():
     json_variable = data.get('jsonVariable')
     param = data.get('param')
     project_id = Project.query.filter_by(name=project_name).first().id
-    current_user_name = User.query.filter_by(id=current_user.id).first().name
-    if current_user_name not in Project.query.filter_by(id=project_id).first().user_id:
+    # current_user_name = User.query.filter_by(id=current_user.id).first().name
+    if str(current_user.id) not in Project.query.filter_by(id=project_id).first().user_id:
         return jsonify({'msg': '不能操作别人项目用例', 'status': 0})
     if not project_name:
         return jsonify({'msg': '项目不能为空', 'status': 0})
@@ -74,6 +74,7 @@ def add_api_msg():
         old_data.param = param
         old_data.extract = extract
         old_data.module_id = module_id
+        old_data.user_id = current_user.id
         db.session.commit()
         return jsonify({'msg': '修改成功', 'status': 1, 'api_msg_id': api_msg_id, 'num': num})
     else:
@@ -96,7 +97,8 @@ def add_api_msg():
                                status_url=status_url,
                                variable_type=variable_type,
                                json_variable=json_variable,
-                               extract=extract, )
+                               extract=extract,
+                               user_id=current_user.id)
             db.session.add(new_cases)
             db.session.commit()
             return jsonify({'msg': '新建成功', 'status': 1, 'api_msg_id': new_cases.id, 'num': new_cases.num})
@@ -119,8 +121,7 @@ def edit_api_msg():
              'variable': json.loads(_edit.variable),
              'json_variable': _edit.json_variable,
              'extract': json.loads(_edit.extract),
-            # 'validate': convert_str2int(_edit.validate)}
-            'validate': json.loads(_edit.validate)}
+             'validate': json.loads(_edit.validate)}
 
     return jsonify({'data': _data, 'status': 1})
 
@@ -203,7 +204,11 @@ def find_api_msg():
              'header': json.loads(c.header),
              'statusCase': {'extract': [True, True], 'variable': [True, True],
                             'validate': [True, True], 'param': [True, True], 'header': [True, True]},
-             'status': True, 'case_name': c.name, 'down_func': c.down_func, 'up_func': c.up_func, 'time': 1}
+             'status': True, 'case_name': c.name, 'down_func': c.down_func, 'up_func': c.up_func, 'time': 1,
+             'owner': User.query.filter(User.id == c.user_id).first().name,
+             'createTime': str(c.created_time).split('.')[0],
+             'updateTime': str(c.update_time).split('.')[0],
+             }
             for c in api_data]
     return jsonify({'data': _api, 'total': total, 'status': 1})
 
@@ -256,6 +261,7 @@ def file_change():
         # status_url = msg['test']['url'].replace(msg['test']['name'], '')
         # msg['test']['url'] = msg['test']['name']
         # print(msg['test']['status_url'])
+
         for h in host:
             if msg['status_url'] in h:
                 msg['status_url'] = host.index(h)

@@ -19,3 +19,5 @@ worker_class = 'gunicorn.workers.ggevent.GeventWorker'
 
 # 代码发生变化是否自动重启
 reload = True
+
+timeout = 180

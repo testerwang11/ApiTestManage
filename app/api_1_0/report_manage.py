@@ -1,6 +1,7 @@
 import json
 import copy
 from flask import jsonify, request
+from sqlalchemy import func
 from . import api, login_required
 from app.models import *
 from ..util.http_run import RunCase
@@ -117,12 +118,24 @@ def find_report():
     pagination = report_data.order_by(Report.create_time.desc()).paginate(page, per_page=per_page, error_out=False)
     report = pagination.items
     total = pagination.total
-    report = [{'name': c.case_names, 'project_name': Project.query.filter_by(id=c.project_id).first().name, 'id': c.id, 'read_status': c.read_status,
+    report = [{'name': c.case_names, 'project_name': Project.query.filter_by(id=c.project_id).first().name, 'id': c.id,
+               'read_status': c.read_status,
                'performer': c.performer,
                'taskName': c.task_name,
                'envData': envTrans(c.environment_choice),
                'create_time': str(c.create_time).split('.')[0]} for c in report]
     return jsonify({'data': report, 'total': total, 'status': 1})
+
+
+@api.route('/report/chart', methods=['GET'])
+def find_report_chart1():
+    # rs = db.session.query(ApiMsg.project_id, func.sum(ApiMsg.project_id)).group_by(ApiMsg.project_id).all()
+    rs = db.engine.execute('select project_id, count(id) from api_msg group by project_id')
+    chart1 = [{"name": c.name
+               } for c in rs]
+    for row in rs:
+        print("记录:", str(row[0]), str(row[1]))
+    return jsonify({'msg': '成功', 'status': 1})
 
 
 def envTrans(env):
