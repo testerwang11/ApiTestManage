@@ -25,8 +25,8 @@ def add_case():
     api_cases = data.get('apiCases')
     merge_variable = json.dumps(json.loads(variable) + json.loads(project_data.variables))
     _temp_check = extract_variables(convert(json.loads(merge_variable)))
-    current_user_name = User.query.filter_by(id=current_user.id).first().name
-    if current_user_name not in Project.query.filter_by(id=project_id).first().user_id:
+    # current_user_name = User.query.filter_by(id=current_user.id).first().name
+    if current_user.id not in Project.query.filter_by(id=project_id).first().user_id:
         return jsonify({'msg': '不能操作别人项目用例', 'status': 0})
     if not case_set_id:
         return jsonify({'msg': '请选择用例集', 'status': 0})

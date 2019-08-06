@@ -135,8 +135,7 @@ def find_user():
         if not _users:
             return jsonify({'msg': '没有该用户', 'status': 0})
     else:
-        users = User.query
-        pagination = users.order_by(User.id.asc()).paginate(page, per_page=per_page, error_out=False)
+        pagination = User.query.order_by(User.id.asc()).paginate(page, per_page=per_page, error_out=False)
         _users = pagination.items
         total = pagination.total
     users = [{'userName': c.name, 'user_id': c.id, 'status': c.status} for c in _users]

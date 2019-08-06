@@ -1,6 +1,5 @@
 from flask import jsonify, request
 from . import api
-from app.models import *
 from ..util.custom_decorator import login_required
 from ..util.utils import *
 from flask_login import current_user
