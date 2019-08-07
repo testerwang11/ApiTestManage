@@ -60,13 +60,14 @@ def add_case():
             old_data.case_set_id = case_set_id
             old_data.func_address = func_address
             old_data.variable = variable
+            old_data.user_id = current_user.id
             db.session.commit()
         for _num, c in enumerate(api_cases):
             if c.get('id'):
                 old_api_case = CaseData.query.filter_by(id=c.get('id')).first()
                 old_api_case.num = _num
                 old_api_case.extract = json.dumps(c['extract'])
-                #old_api_case.validate = json.dumps(c['validate'])
+                # old_api_case.validate = json.dumps(c['validate'])
                 old_api_case.validate = convert_str2int(c['validate'])
                 old_api_case.variable = json.dumps(c['variable'])
                 old_api_case.header = json.dumps(c['header'])
@@ -82,6 +83,7 @@ def add_case():
                 old_api_case.status = json.dumps(c['status'])
                 old_api_case.up_func = c['up_func']
                 old_api_case.down_func = c['down_func']
+                old_api_case.user_id = current_user.id
                 db.session.commit()
             else:
                 new_api_case = CaseData(num=_num,
@@ -89,7 +91,7 @@ def add_case():
                                         variable=json.dumps(c['variable']),
                                         extract=json.dumps(c['extract']),
                                         param=json.dumps(c['param']),
-                                        #validate=json.dumps(c['validate']),
+                                        # validate=json.dumps(c['validate']),
                                         validate=convert_str2int(c['validate']),
                                         case_id=ids,
                                         time=c['time'],
@@ -101,7 +103,8 @@ def add_case():
                                         header=json.dumps(c['header']),
                                         status_header=json.dumps(c['statusCase']['header']),
                                         status=json.dumps(c['status']),
-                                        name=c['case_name'], up_func=c['up_func'], down_func=c['down_func'])
+                                        name=c['case_name'], up_func=c['up_func'], down_func=c['down_func'],
+                                        user_id=current_user.id)
                 db.session.add(new_api_case)
                 db.session.commit()
         return jsonify({'msg': '修改成功', 'status': 1})
@@ -124,7 +127,7 @@ def add_case():
                                         extract=json.dumps(c['extract']),
                                         param=json.dumps(c['param']),
                                         time=c['time'],
-                                        #validate=json.dumps(c['validate']),
+                                        # validate=json.dumps(c['validate']),
                                         validate=convert_str2int(c['validate']),
                                         case_id=case_id,
                                         api_msg_id=c['apiMsgId'],
@@ -135,7 +138,8 @@ def add_case():
                                         header=json.dumps(c['header']),
                                         status_header=json.dumps(c['statusCase']['header']),
                                         status=json.dumps(c['status']),
-                                        name=c['case_name'], up_func=c['up_func'], down_func=c['down_func'])
+                                        name=c['case_name'], up_func=c['up_func'], down_func=c['down_func'],
+                                        user_id=current_user.id)
                 db.session.add(new_api_case)
                 db.session.commit()
             return jsonify({'msg': '新建成功', 'status': 1, 'case_id': case_id})

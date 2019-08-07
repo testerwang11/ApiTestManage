@@ -31,7 +31,6 @@ def add_api_msg():
     json_variable = data.get('jsonVariable')
     param = data.get('param')
     project_id = Project.query.filter_by(name=project_name).first().id
-    # current_user_name = User.query.filter_by(id=current_user.id).first().name
     if str(current_user.id) not in Project.query.filter_by(id=project_id).first().user_id:
         return jsonify({'msg': '不能操作别人项目用例', 'status': 0})
     if not project_name:
@@ -47,6 +46,7 @@ def add_api_msg():
     if status_url == -1:
         if 'http' not in url:
             return jsonify({'msg': '基础url为空时，请补全api地址', 'status': 0})
+
 
     num = auto_num(data.get('num'), ApiMsg, module_id=module_id)
 

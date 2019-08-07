@@ -1,6 +1,5 @@
 from flask import jsonify, request
 from . import api, login_required
-from app.models import *
 from flask_login import current_user
 from ..util.utils import *
 
@@ -91,8 +90,8 @@ def del_set():
     set_id = data.get('id')
     _edit = CaseSet.query.filter_by(id=set_id).first()
     case = Case.query.filter_by(case_set_id=set_id).first()
-    current_user_name = User.query.filter_by(id=current_user.id).first().name
-    if current_user_name not in Project.query.filter_by(id=_edit.project_id).first().user_id:
+    #current_user_name = User.query.filter_by(id=current_user.id).first().name
+    if str(current_user.id) not in Project.query.filter_by(id=_edit.project_id).first().user_id:
         return jsonify({'msg': '不能删除别人项目下的模块', 'status': 0})
     if case:
         return jsonify({'msg': '请先删除集合下的接口用例', 'status': 0})
