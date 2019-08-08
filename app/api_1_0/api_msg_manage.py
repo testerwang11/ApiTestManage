@@ -47,8 +47,11 @@ def add_api_msg():
         if 'http' not in url:
             return jsonify({'msg': '基础url为空时，请补全api地址', 'status': 0})
 
+    print("传递的值:" + str(data.get('num')))
 
+    """自动返回最大的值"""
     num = auto_num(data.get('num'), ApiMsg, module_id=module_id)
+    print("计算的值:" + str(num))
 
     if api_msg_id:
         old_data = ApiMsg.query.filter_by(id=api_msg_id).first()
@@ -268,7 +271,7 @@ def file_change():
                 break
         else:
             msg['status_url'] = '0'
-        new_case = ApiMsg(project_id=project_data.id, module_id=module_id, num=case_num, **msg)
+        new_case = ApiMsg(project_id=project_data.id, module_id=module_id, num=case_num, user_id=current_user.id,**msg)
         db.session.add(new_case)
         db.session.commit()
         case_num += 1

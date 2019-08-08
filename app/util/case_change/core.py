@@ -68,7 +68,10 @@ class HarParser(object):
         request_params = convert_list_to_dict(entry_json["request"].get("queryString", []))
 
         url = entry_json["request"].get("url")
-        description = entry_json["description"]
+        try:
+            description = entry_json["description"]
+        except:
+            description = None
         if not url:
             logging.exception("url missed in request.")
             sys.exit(1)

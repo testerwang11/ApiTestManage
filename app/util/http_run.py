@@ -163,9 +163,6 @@ class RunCase(object):
 
         if api_data.method == 'GET':
             pass
-        # elif _variables:
-        #     print(_variables)
-        #     print(111)
         elif api_data.variable_type == 'text' and _variables:
             for variable in _variables:
                 if variable['param_type'] == 'string' and variable.get('key'):
@@ -235,8 +232,6 @@ class RunCase(object):
         :return:
         """
         scheduler.app.logger.info('本次测试的用例id：{}'.format(case_ids))
-        # print('本次测试的用例id：{}'.format(case_ids))
-
         for case_id in case_ids:
             case_data = Case.query.filter_by(id=case_id).first()
             case_times = case_data.times if case_data.times else 1
@@ -280,5 +275,4 @@ class RunCase(object):
         runner = HttpRunner(failfast=False)
         runner.run(self.TEST_DATA)
         jump_res = json.dumps(runner._summary, ensure_ascii=False, default=encode_object, cls=JSONEncoder)
-        # scheduler.app.logger.info('返回数据：{}'.format(jump_res))
         return jump_res

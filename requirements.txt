@@ -68,4 +68,3 @@ webencodings==0.5.1
 Werkzeug==0.14.1
 beautifulsoup4==4.7.1
 cssselect==1.0.3
-lxml=4.4.0
