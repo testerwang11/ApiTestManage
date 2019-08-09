@@ -1,6 +1,5 @@
 from flask import jsonify, request
 from flask_login import current_user
-from app.models import *
 from app.util.case_change.core import HarParser
 from . import api, login_required
 from ..util.http_run import RunCase
@@ -47,11 +46,8 @@ def add_api_msg():
         if 'http' not in url:
             return jsonify({'msg': '基础url为空时，请补全api地址', 'status': 0})
 
-    print("传递的值:" + str(data.get('num')))
-
     """自动返回最大的值"""
     num = auto_num(data.get('num'), ApiMsg, module_id=module_id)
-    print("计算的值:" + str(num))
 
     if api_msg_id:
         old_data = ApiMsg.query.filter_by(id=api_msg_id).first()
@@ -77,7 +73,6 @@ def add_api_msg():
         old_data.param = param
         old_data.extract = extract
         old_data.module_id = module_id
-        old_data.user_id = current_user.id
         db.session.commit()
         return jsonify({'msg': '修改成功', 'status': 1, 'api_msg_id': api_msg_id, 'num': num})
     else:
@@ -208,7 +203,7 @@ def find_api_msg():
              'statusCase': {'extract': [True, True], 'variable': [True, True],
                             'validate': [True, True], 'param': [True, True], 'header': [True, True]},
              'status': True, 'case_name': c.name, 'down_func': c.down_func, 'up_func': c.up_func, 'time': 1,
-             'owner': User.query.filter(User.id == c.user_id).first().name,
+             'owner': getUserNameById(c.user_id),
              'createTime': str(c.created_time).split('.')[0],
              'updateTime': str(c.update_time).split('.')[0],
              }
@@ -271,7 +266,7 @@ def file_change():
                 break
         else:
             msg['status_url'] = '0'
-        new_case = ApiMsg(project_id=project_data.id, module_id=module_id, num=case_num, user_id=current_user.id,**msg)
+        new_case = ApiMsg(project_id=project_data.id, module_id=module_id, num=case_num, user_id=current_user.id, **msg)
         db.session.add(new_case)
         db.session.commit()
         case_num += 1
@@ -293,3 +288,13 @@ def move_api_msg():
         db.session.commit()
 
     return jsonify({'msg': "移动成功", 'status': 1})
+
+
+def getUserNameById(user_id):
+    name = ""
+    if user_id:
+        try:
+            name = User.query.filter(User.id == user_id).first().name
+        except:
+            name = "无"
+    return name
