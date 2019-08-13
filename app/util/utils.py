@@ -7,6 +7,7 @@ import types
 import socket
 from app.models import *
 
+
 def auto_num(num, model, **kwargs):
     """自动返回编号的最大值"""
     if not num:
@@ -248,17 +249,34 @@ def convert_str2int(validate):
 
     for i in range(0, len(jsonarray)):
         print(i, jsonarray[i])
-        if jsonarray[i]['key'] != None:
+        if jsonarray[i]['key'] is not None:
             comparator = jsonarray[i]['comparator']
             """比较运算期望值转为int"""
             if comparator in comparators:
                 print("检查:" + comparator)
                 jsonarray[i]['value'] = int(jsonarray[i]['value'])
-                #jsonarray.append(jsonarray[i])
+                # jsonarray.append(jsonarray[i])
         else:
-            print("移除")
             jsonarray.pop(i)
     return json.dumps(jsonarray)
+
+
+def removeNullLine(extract):
+    """删除提取器里边的空格"""
+    jeopardy = json.loads(extract, encoding='utf-8')
+    for i in range(0, len(jeopardy)):
+        if jeopardy[i]['key'] is None:
+            jeopardy.pop(i)
+    return json.dumps(jeopardy)
+
+
+def removeParamNull(param):
+    """删除param里的空格"""
+    jeopardy = json.loads(param, encoding='utf-8')
+    for i in range(0, len(jeopardy)):
+        if len(jeopardy[i]['key']) == 0:
+            jeopardy.pop(i)
+    return json.dumps(jeopardy)
 
 
 def getIP():
@@ -281,7 +299,6 @@ def envTrans(env):
     return str
 
 
-
 if __name__ == '__main__':
     # func_list = importlib.reload(importlib.import_module(r"func_list.abuild_in_fun.py"))
     # module_functions_dict = {name: item for name, item in vars(func_list).items() if
@@ -289,7 +306,7 @@ if __name__ == '__main__':
     # print(module_functions_dict)
     a = '${func({"birthday": "199-02-02"; "expire_age": "65周岁"; "sex": "2"},123,3245)}'
     b = '${func([123],123)}'
-    #print(getIP())
+    # print(getIP())
     # matched = parse_function(extract_functions(b)[0])
     #
     # print(matched)
