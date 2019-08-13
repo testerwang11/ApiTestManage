@@ -27,7 +27,7 @@ def add_api_msg():
     status_url = data.get('choiceUrl')
     variable = removeNullLine(data.get('variable'))
     json_variable = data.get('jsonVariable')
-    param = removeParamNull(data.get('param'))
+    param = removeNullLine(data.get('param'))
     project_id = Project.query.filter_by(name=project_name).first().id
     if str(current_user.id) not in Project.query.filter_by(id=project_id).first().user_id:
         return jsonify({'msg': '不能操作别人项目用例', 'status': 0})
