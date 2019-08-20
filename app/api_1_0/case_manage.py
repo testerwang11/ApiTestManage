@@ -25,7 +25,6 @@ def add_case():
     api_cases = data.get('apiCases')
     merge_variable = json.dumps(json.loads(variable) + json.loads(project_data.variables))
     _temp_check = extract_variables(convert(json.loads(merge_variable)))
-    # current_user_name = User.query.filter_by(id=current_user.id).first().name
     if str(current_user.id) not in Project.query.filter_by(id=project_id).first().user_id:
         return jsonify({'msg': '不能操作别人项目用例', 'status': 0})
     if not case_set_id:
@@ -60,7 +59,7 @@ def add_case():
             old_data.case_set_id = case_set_id
             old_data.func_address = func_address
             old_data.variable = variable
-            old_data.user_id = current_user.id
+            old_data.update_id = current_user.id
             db.session.commit()
         for _num, c in enumerate(api_cases):
             if c.get('id'):
@@ -104,7 +103,7 @@ def add_case():
                                         status_header=json.dumps(c['statusCase']['header']),
                                         status=json.dumps(c['status']),
                                         name=c['case_name'], up_func=c['up_func'], down_func=c['down_func'],
-                                        user_id=current_user.id)
+                                        update_id=current_user.id)
                 db.session.add(new_api_case)
                 db.session.commit()
         return jsonify({'msg': '修改成功', 'status': 1})
@@ -116,7 +115,7 @@ def add_case():
         else:
 
             new_case = Case(num=num, name=name, desc=desc, project_id=project_id, variable=variable,
-                            func_address=func_address, case_set_id=case_set_id, times=times)
+                            func_address=func_address, case_set_id=case_set_id, times=times, user_id=current_user.id)
             db.session.add(new_case)
             db.session.commit()
             case_id = new_case.id
@@ -167,8 +166,12 @@ def find_case():
         pagination = cases.order_by(Case.num.asc()).paginate(page, per_page=per_page, error_out=False)
         cases = pagination.items
         total = pagination.total
-    cases = [{'num': c.num, 'name': c.name, 'label': c.name, 'leaf': True, 'desc': c.desc, 'sceneId': c.id}
-             for c in cases]
+    cases = [
+        {'num': c.num, 'name': c.name, 'label': c.name, 'leaf': True, 'desc': c.desc, 'sceneId': c.id,
+         "owner": getUserNameById(c.user_id), "update_user": getUserNameById(c.update_id),
+         "createTime": str(c.created_time).split('.')[0],
+         "updateTime": str(c.update_time).split('.')[0]}
+        for c in cases]
     return jsonify({'data': cases, 'total': total, 'status': 1})
 
 
@@ -260,3 +263,13 @@ def data_config():
     return jsonify({'data': {'variables': json.loads(_data.variables),
                              'func_address': json.loads(_data.func_address)},
                     'status': 1})
+
+
+def getUserNameById(user_id):
+    name = ""
+    if user_id:
+        try:
+            name = User.query.filter(User.id == user_id).first().name
+        except:
+            name = "无名氏"
+    return name

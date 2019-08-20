@@ -169,6 +169,7 @@ class Case(db.Model):
     created_time = db.Column(db.DateTime, index=True, default=datetime.now, comment='创建时间')
     update_time = db.Column(db.DateTime, index=True, default=datetime.now, onupdate=datetime.now)
     user_id = db.Column(db.Integer(), nullable=True, comment='所属的用户id')
+    update_id = db.Column(db.Integer(), nullable=True, comment='更新用户id')
 
 
 class ApiMsg(db.Model):
@@ -194,6 +195,8 @@ class ApiMsg(db.Model):
     created_time = db.Column(db.DateTime, index=True, default=datetime.now)
     update_time = db.Column(db.DateTime, index=True, default=datetime.now, onupdate=datetime.now)
     user_id = db.Column(db.Integer(), nullable=True, comment='所属的用户id')
+    update_id = db.Column(db.Integer(), nullable=True, comment='更新用户id')
+
 
 
 class CaseData(db.Model):
@@ -221,6 +224,7 @@ class CaseData(db.Model):
     created_time = db.Column(db.DateTime, index=True, default=datetime.now)
     update_time = db.Column(db.DateTime, index=True, default=datetime.now, onupdate=datetime.now)
     user_id = db.Column(db.Integer(), nullable=True, comment='所属的用户id')
+    update_id = db.Column(db.Integer(), nullable=True, comment='更新用户id')
 
 
 
